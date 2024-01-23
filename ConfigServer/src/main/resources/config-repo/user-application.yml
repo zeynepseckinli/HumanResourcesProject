@@ -1,0 +1,28 @@
+server:
+  port: 9092
+
+spring:
+  amqp:
+    deserialization:
+      trust:
+        all: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: BilgeAdmin
+    password: Aa123456
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: grupsurup
+      username: grupsurup
+      password: 12345
+my-application:
+  secret-key: "bAjAfl&ato9ruwrichlyUc1Lfaprafr8soNoCr!BramaTR7mojicr1wRI0*oC3is"
+  secret-key-2: ${SECRETKEY}
+
+usermicroservice:
+  redis:
+    host: localhost
+    port: 6379

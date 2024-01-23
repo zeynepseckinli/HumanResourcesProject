@@ -1,0 +1,17 @@
+buildscript {
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${versions.springBoot}")
+    }
+}
+
+dependencies {
+    implementation libs.springBootDataMongoDB
+    implementation libs.springCloudConfigClient
+    implementation libs.springBootAmqp
+    implementation libs.springBootDataRedis
+    implementation libs.springCloudOpenFeign
+}
+
+test {
+    useJUnitPlatform()
+}
