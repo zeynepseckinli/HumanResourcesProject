@@ -1,5 +1,6 @@
 package com.bilgeadam.controller;
 
+import com.bilgeadam.dto.request.CreateAdvanceRequestDto;
 import com.bilgeadam.dto.request.GetProfileByTokenRequestDto;
 import com.bilgeadam.dto.request.UserSaveRequestDto;
 import com.bilgeadam.dto.request.UserUpdateRequestDto;
@@ -8,10 +9,11 @@ import com.bilgeadam.repository.entity.UserProfile;
 import com.bilgeadam.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.bilgeadam.constants.RestApiUrls.USER;
+import static com.bilgeadam.constants.RestApiUrls.*;
 
 @RestController
 @RequestMapping(USER)
@@ -21,22 +23,21 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/getMessage")
-    public String getMessage(){
+    public String getMessage() {
         return "This is User Service";
     }
 
-    @PostMapping("/save")
+    @PostMapping(SAVE)
     @CrossOrigin("*")
-    public ResponseEntity<Void> save(@RequestBody @Valid UserSaveRequestDto dto){
-        UserProfile userProfile =   userService.save(dto);
+    public ResponseEntity<Void> save(@RequestBody @Valid UserSaveRequestDto dto) {
+        UserProfile userProfile = userService.save(dto);
         return ResponseEntity.ok().build();
     }
 
 
-
-    @PutMapping("/update")
+    @PutMapping(UPDATE)
     @CrossOrigin("*")
-    public ResponseEntity<Boolean> update(@RequestBody @Valid UserUpdateRequestDto dto){
+    public ResponseEntity<Boolean> update(@RequestBody @Valid UserUpdateRequestDto dto) {
         return ResponseEntity.ok(userService.update(dto));
     }
 
@@ -44,5 +45,10 @@ public class UserController {
     @CrossOrigin("*")
     public ResponseEntity<UserResponseDto> getProfileByToken(@RequestBody @Valid GetProfileByTokenRequestDto dto) {
         return ResponseEntity.ok(userService.getProfileByToken(dto));
+    }
+
+    @PostMapping("/createAdvance")
+    public ResponseEntity<Boolean> createAdvance(@RequestBody @Valid CreateAdvanceRequestDto dto) {
+        return ResponseEntity.ok(userService.createAdvance(dto));
     }
 }
