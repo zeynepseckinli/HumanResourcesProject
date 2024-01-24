@@ -15,9 +15,9 @@ spring:
     mongodb:
       host: localhost
       port: 27017
-      database: grupsurup
-      username: grupsurup
-      password: 12345
+      database: UserProfileDB
+      username: defaultUSer
+      password: bilge!*123
 my-application:
   secret-key: "bAjAfl&ato9ruwrichlyUc1Lfaprafr8soNoCr!BramaTR7mojicr1wRI0*oC3is"
   secret-key-2: ${SECRETKEY}
