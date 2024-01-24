@@ -1,9 +1,6 @@
 package com.bilgeadam.controller;
 
-import com.bilgeadam.dto.request.CreateAdvanceRequestDto;
-import com.bilgeadam.dto.request.GetProfileByTokenRequestDto;
-import com.bilgeadam.dto.request.UserSaveRequestDto;
-import com.bilgeadam.dto.request.UserUpdateRequestDto;
+import com.bilgeadam.dto.request.*;
 import com.bilgeadam.dto.response.UserResponseDto;
 import com.bilgeadam.repository.entity.UserProfile;
 import com.bilgeadam.service.UserService;
@@ -50,5 +47,11 @@ public class UserController {
     @PostMapping("/createAdvance")
     public ResponseEntity<Boolean> createAdvance(@RequestBody @Valid CreateAdvanceRequestDto dto) {
         return ResponseEntity.ok(userService.createAdvance(dto));
+    }
+
+
+    @PostMapping("/createPermission")
+    public ResponseEntity<?> createPermission(@RequestBody @Valid CreatePermissionRequestDto dto) {
+        return ResponseEntity.ok(userService.createPermission(dto));
     }
 }
