@@ -1,6 +1,6 @@
 package com.bilgeadam.repository.entity;
 
-import com.bilgeadam.utility.enums.State;
+import com.bilgeadam.utility.enums.EState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,7 +27,7 @@ public class Permission extends BaseEntity {
     private LocalDate startOfPermission;
     private LocalDate endOfPermission;
     private int permissionDuration;
-    private State permissionState;
+    private EState permissionState;
 
 
 }
