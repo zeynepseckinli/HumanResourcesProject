@@ -14,7 +14,7 @@ import com.bilgeadam.repository.entity.Advance;
 import com.bilgeadam.repository.entity.Permission;
 import com.bilgeadam.repository.entity.UserProfile;
 import com.bilgeadam.utility.JwtTokenManager;
-import com.bilgeadam.utility.enums.State;
+import com.bilgeadam.utility.enums.EState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -94,7 +94,7 @@ public class UserService {
 //        permission.setPermissionDuration(dto.getPermissionDuration());
 //        permission.setStartOfPermission(dto.getStartOfPermission());
 //        permission.setEndOfPermission(dto.getEndOfPermission());
-        permission.setPermissionState(State.PENDING);
+        permission.setPermissionState(EState.PENDING);
         permissionRepository.save(permission);
         return true;
     }
