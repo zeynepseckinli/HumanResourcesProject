@@ -27,7 +27,7 @@ public class UserController {
     @PostMapping(SAVE)
     @CrossOrigin("*")
     public ResponseEntity<Void> save(@RequestBody @Valid UserSaveRequestDto dto) {
-        UserProfile userProfile = userService.save(dto);
+        UserProfile userProfile = userService.saveUser(dto);
         return ResponseEntity.ok().build();
     }
 
@@ -35,7 +35,7 @@ public class UserController {
     @PutMapping(UPDATE)
     @CrossOrigin("*")
     public ResponseEntity<Boolean> update(@RequestBody @Valid UserUpdateRequestDto dto) {
-        return ResponseEntity.ok(userService.update(dto));
+        return ResponseEntity.ok(userService.updateUser(dto));
     }
 
     @PostMapping("/getProfile")

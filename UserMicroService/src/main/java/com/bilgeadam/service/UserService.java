@@ -30,11 +30,17 @@ public class UserService {
     private final JwtTokenManager jwtTokenManager;
     private final PermissionRepository permissionRepository;
 
-    public UserProfile save(UserSaveRequestDto dto) {
+    public UserProfile saveUser(UserSaveRequestDto dto) {
         return userRepository.save(UserProfile.builder()
                 .email(dto.getEmail())
                 .authId(dto.getAuthId())
                 .build());
+    }
+
+    public Boolean createUser(CreateUserRequestDto dto){
+        UserProfile user = UserMapper.INSTANCE.fromCreateUserRequestDto(dto);
+        userRepository.save(user);
+        return true;
     }
 
     public UserResponseDto getProfileByToken(GetProfileByTokenRequestDto dto) {
@@ -49,7 +55,7 @@ public class UserService {
         return UserMapper.INSTANCE.toUserResponseDto(user.get());
     }
 
-    public Boolean update(UserUpdateRequestDto dto) {
+    public Boolean updateUser(UserUpdateRequestDto dto) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
