@@ -18,6 +18,8 @@ import com.bilgeadam.utility.enums.EState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -76,7 +78,19 @@ public class UserService {
             throw new UserException(ErrorType.ADVANCE_ERROR);
         }
         Advance advance = AdvanceMapper.INSTANCE.fromDto(dto);
+        advance.setAdvanceState(EState.PENDING);
         advanceRepository.save(advance);
+        return true;
+    }
+
+    public Boolean updateAdvanceState(UpdateStateRequestDto dto) {
+        Optional<Advance> advance = advanceRepository.findById(dto.getId());
+        if(advance.isEmpty()) {
+            throw new UserException(ErrorType.REQUEST_NOT_FOUND);
+        }
+        advance.get().setAdvanceState(dto.getApprovalState());
+        advance.get().setResponseDate(LocalDate.now());
+        advanceRepository.save(advance.get());
         return true;
     }
 
@@ -99,7 +113,17 @@ public class UserService {
         return true;
     }
 
+    public Boolean updatePermissionState(UpdateStateRequestDto dto) {
+        Optional<Permission> permission = permissionRepository.findById(dto.getId());
+        if(permission.isEmpty()) {
+            throw new UserException(ErrorType.REQUEST_NOT_FOUND);
+        }
+        permission.get().setPermissionState(dto.getApprovalState());
+        permission.get().setDateOfResponse(LocalDate.now());
+        permissionRepository.save(permission.get());
+        return true;
+    }
 
-    // UPDATE METHODU
-    //github
+
+
 }

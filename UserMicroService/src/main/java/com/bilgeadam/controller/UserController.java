@@ -49,9 +49,20 @@ public class UserController {
         return ResponseEntity.ok(userService.createAdvance(dto));
     }
 
+    @PutMapping("/updateAdvanceState")
+    public ResponseEntity<Boolean> updateAdvanceState (@RequestBody UpdateStateRequestDto dto) {
+        return ResponseEntity.ok(userService.updateAdvanceState(dto));
+    }
+
 
     @PostMapping("/createPermission")
     public ResponseEntity<?> createPermission(@RequestBody @Valid CreatePermissionRequestDto dto) {
         return ResponseEntity.ok(userService.createPermission(dto));
     }
+
+    @PostMapping("/updatePermissionState")
+    public ResponseEntity<Boolean> updatePermissionState(@RequestBody UpdateStateRequestDto dto){
+        return ResponseEntity.ok(userService.updatePermissionState(dto));
+    }
+
 }
