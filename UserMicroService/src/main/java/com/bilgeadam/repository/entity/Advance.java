@@ -1,6 +1,6 @@
 package com.bilgeadam.repository.entity;
 
-import com.bilgeadam.utility.enums.State;
+import com.bilgeadam.utility.enums.EState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,6 +27,6 @@ public class Advance extends BaseEntity {
     private String advanceType;
     private LocalDate requestDate;
     private LocalDate responseDate;
-    private State advanceState;
+    private EState advanceState;
 
 }

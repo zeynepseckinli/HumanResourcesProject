@@ -1,10 +1,11 @@
 package com.bilgeadam.repository.entity;
 
 
-import com.bilgeadam.utility.enums.Role;
+import com.bilgeadam.utility.enums.ERole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -28,6 +29,7 @@ public class Auth extends BaseEntity{
     private String email;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    @Builder.Default
+    private ERole role=ERole.EMPLOYEE;
 
 }

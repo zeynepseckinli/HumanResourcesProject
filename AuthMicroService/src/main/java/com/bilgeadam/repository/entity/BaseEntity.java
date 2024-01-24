@@ -1,10 +1,11 @@
 package com.bilgeadam.repository.entity;
 
-import com.bilgeadam.utility.enums.State;
+import com.bilgeadam.utility.enums.EState;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -18,5 +19,6 @@ public class BaseEntity {
     private Long createDate;
     private Long UpdateDate;
     @Enumerated(EnumType.STRING)
-    private State state;
+    @Builder.Default
+    private EState state = EState.ACTIVE;
 }

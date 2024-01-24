@@ -1,6 +1,8 @@
 package com.bilgeadam.repository.entity;
 
+import com.bilgeadam.utility.enums.ERole;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -19,6 +21,7 @@ public class UserProfile extends BaseEntity {
     @Id
     private String id;
     private Long authId;
+    private ERole role;
     private String name;
     private String secondName;
     private String surname;
@@ -32,7 +35,8 @@ public class UserProfile extends BaseEntity {
     private String company;
     private String address;
     private String phone;
-    private Long salary;
+    @Builder.Default
+    private Long salary = 0L;
     private LocalDate birthDate;
     private LocalDate jobStart;
     private LocalDate jobEnd;

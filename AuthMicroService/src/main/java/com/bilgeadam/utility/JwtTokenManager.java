@@ -4,6 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.bilgeadam.utility.enums.ERole;
+import com.bilgeadam.utility.enums.EState;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -30,14 +32,14 @@ public class JwtTokenManager {
      * @param authId
      * @return
      */
-    public Optional<String> createToken(Long authId){
+    public Optional<String> createToken(Long authId, ERole role, EState state){
         String token;
         try{
             token = JWT.create()
                     .withAudience()
                     .withClaim("authId",authId) // DİKKAT!!! buralara(Claim) eklediğiniz datalar şifrelenmez
-                    .withClaim("howtopage","AuthMicroService")
-                    .withClaim("listeeklesek", List.of("bu listemi"))
+                    .withClaim("role",role.toString())
+                    .withClaim("state",state.toString())
                     .withIssuer(ISSUER) // jwt yi üreten sahiplik
                     .withIssuedAt(new Date()) // jwt üretilme zamanı
                     .withExpiresAt(new Date(System.currentTimeMillis()+EXDATE))// jwt nin sona erme tarihi

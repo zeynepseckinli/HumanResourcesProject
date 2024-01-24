@@ -4,6 +4,7 @@ import com.bilgeadam.dto.request.ChangePasswordDto;
 import com.bilgeadam.dto.request.UserSaveRequestDto;
 import com.bilgeadam.dto.request.LoginRequestDto;
 import com.bilgeadam.dto.request.RegisterRequestDto;
+import com.bilgeadam.dto.response.LoginResponseDto;
 import com.bilgeadam.exception.AuthException;
 import com.bilgeadam.exception.ErrorType;
 import com.bilgeadam.manager.UserManager;
@@ -11,7 +12,7 @@ import com.bilgeadam.mapper.AuthMapper;
 import com.bilgeadam.repository.AuthRepository;
 import com.bilgeadam.repository.entity.Auth;
 import com.bilgeadam.utility.JwtTokenManager;
-import com.bilgeadam.utility.enums.State;
+import com.bilgeadam.utility.enums.EState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,20 +26,27 @@ public class AuthService {
     private final JwtTokenManager jwtTokenManager;
     private final UserManager userManager;
 
-    public String login(LoginRequestDto dto) {
+    public LoginResponseDto login(LoginRequestDto dto) {
         Optional<Auth> authOptional =  authRepository.findOptionalByEmailAndPassword(dto.getEmail(),dto.getPassword());
         if(authOptional.isEmpty()){
             throw new AuthException(ErrorType.LOGIN_ERROR);
         }
-        if(authOptional.get().getState()!=State.ACTIVE){
-            throw new AuthException(ErrorType.PASSWORD_UPDATE_REQUIRED);
+        if(!authOptional.get().getState().equals(EState.ACTIVE)){
+            throw new AuthException(ErrorType.ACCOUNT_NOT_ACTIVE);
             //TODO: sifre guncellemeye yonlendirip state.ACTIVE olarak duzenlenecek
             //changePassword metotu kullanılacak
         }
-        Optional<String> jwtToken = jwtTokenManager.createToken(authOptional.get().getId());
+        Optional<String> jwtToken = jwtTokenManager.createToken(authOptional.get().getId(), authOptional.get().getRole(), authOptional.get().getState());
         if(jwtToken.isEmpty())
             throw new AuthException(ErrorType.TOKEN_ERROR);
-        return jwtToken.get();
+
+        LoginResponseDto loginResponseDto = LoginResponseDto.builder()
+                .role(authOptional.get().getRole())
+                .token(jwtToken.get())
+                .authId(authOptional.get().getId())
+                .state(authOptional.get().getState())
+                .build();
+        return loginResponseDto;
     }
 
     public void register(RegisterRequestDto dto) {
@@ -50,7 +58,7 @@ public class AuthService {
         Auth auth = AuthMapper.INSTANCE.fromDto(dto);
         auth.setCreateDate(System.currentTimeMillis());
         auth.setUpdateDate(System.currentTimeMillis());
-        auth.setState(State.ACTIVE);
+        auth.setState(EState.ACTIVE);
         authRepository.save(auth);
 
                 userManager.save(UserSaveRequestDto.builder()
@@ -67,7 +75,7 @@ public class AuthService {
         if (!(auth.get().getPassword().equals(dto.getOldPassword()))) {throw new AuthException(ErrorType.PASSWORD_NOT_MATCH);}
         if (!(dto.getNewPassword().equals(dto.getConfirmPassword()))) {throw new AuthException(ErrorType.PASSWORD_NOT_MATCH);}
         auth.get().setPassword(dto.getNewPassword());
-        auth.get().setState(State.ACTIVE);
+        auth.get().setState(EState.ACTIVE);
         authRepository.save(auth.get());
         return true;
     }

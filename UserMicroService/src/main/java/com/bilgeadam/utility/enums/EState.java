@@ -1,6 +1,6 @@
 package com.bilgeadam.utility.enums;
 
-public enum State {
+public enum EState {
     ACTIVE,
     INACTIVE,
     PENDING,

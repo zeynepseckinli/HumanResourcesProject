@@ -1,6 +1,6 @@
 package com.bilgeadam.repository.entity;
 
-import com.bilgeadam.utility.enums.State;
+import com.bilgeadam.utility.enums.EState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +15,6 @@ import java.io.Serializable;
 @Data
 public class BaseEntity implements Serializable {
     private Long createDate;
-    private Long UpdateDate;
-    private State state;
+    private Long updateDate;
+    private EState state;
 }
