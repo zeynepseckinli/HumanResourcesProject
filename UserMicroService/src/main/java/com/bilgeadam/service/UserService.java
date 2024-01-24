@@ -1,19 +1,20 @@
 package com.bilgeadam.service;
 
-import com.bilgeadam.dto.request.CreateAdvanceRequestDto;
-import com.bilgeadam.dto.request.GetProfileByTokenRequestDto;
-import com.bilgeadam.dto.request.UserSaveRequestDto;
-import com.bilgeadam.dto.request.UserUpdateRequestDto;
+import com.bilgeadam.dto.request.*;
 import com.bilgeadam.dto.response.UserResponseDto;
 import com.bilgeadam.exception.ErrorType;
 import com.bilgeadam.exception.UserException;
 import com.bilgeadam.mapper.AdvanceMapper;
+import com.bilgeadam.mapper.PermissionMapper;
 import com.bilgeadam.mapper.UserMapper;
 import com.bilgeadam.repository.AdvanceRepository;
+import com.bilgeadam.repository.PermissionRepository;
 import com.bilgeadam.repository.UserRepository;
 import com.bilgeadam.repository.entity.Advance;
+import com.bilgeadam.repository.entity.Permission;
 import com.bilgeadam.repository.entity.UserProfile;
 import com.bilgeadam.utility.JwtTokenManager;
+import com.bilgeadam.utility.enums.State;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,7 @@ public class UserService {
     private final AdvanceRepository advanceRepository;
 
     private final JwtTokenManager jwtTokenManager;
+    private final PermissionRepository permissionRepository;
 
     public UserProfile save(UserSaveRequestDto dto) {
         return userRepository.save(UserProfile.builder()
@@ -75,6 +77,25 @@ public class UserService {
         }
         Advance advance = AdvanceMapper.INSTANCE.fromDto(dto);
         advanceRepository.save(advance);
+        return true;
+    }
+
+
+    public Boolean createPermission(CreatePermissionRequestDto dto) {
+        Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+        if (user.isEmpty()) {
+            throw new UserException(ErrorType.USER_NOT_FOUND);
+        }
+        Permission permission = PermissionMapper.INSTANCE.fromDto(dto);
+//        permission.setPermissionDuration(dto.getPermissionDuration());
+//        permission.setStartOfPermission(dto.getStartOfPermission());
+//        permission.setEndOfPermission(dto.getEndOfPermission());
+        permission.setPermissionState(State.PENDING);
+        permissionRepository.save(permission);
         return true;
     }
 }
