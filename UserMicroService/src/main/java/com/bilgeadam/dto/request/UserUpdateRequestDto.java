@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @Data
 public class UserUpdateRequestDto {
     private String token;
+    private Long authId;
     private String name;
     private String secondName;
     private String surname;

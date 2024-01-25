@@ -17,6 +17,7 @@ import com.bilgeadam.repository.entity.Auth;
 import com.bilgeadam.utility.JwtTokenManager;
 import com.bilgeadam.utility.enums.EState;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -90,10 +91,18 @@ public class AuthService {
     }
 
     public Boolean updateAuth(AuthUpdateRequestDto dto) {
-        Optional<Auth> auth = authRepository.findById(dto.getAuthId());
-        if (auth.isPresent()){
-            authRepository.save(AuthMapper.INSTANCE.fromAuthUpdateRequestDto(dto,auth.get()));
+        try {
+            Optional<Auth> auth = authRepository.findById(dto.getAuthId());
+            if (auth.isPresent()) {
+                authRepository.save(AuthMapper.INSTANCE.fromAuthUpdateRequestDto(dto, auth.get()));
+                return true; // Başarılı bir güncelleme durumu
+            } else {
+                return false; // Güncellenecek Auth bulunamadı durumu
+            }
+        } catch (Exception e) {
+            // Detaylı hatayı logla
+            System.out.println(e);
+            return false; // Hata durumu
         }
-        throw new RuntimeException("Hata");
     }
 }

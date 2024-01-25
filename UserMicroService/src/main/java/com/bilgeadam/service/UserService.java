@@ -92,9 +92,11 @@ public class UserService {
         }
         Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
         if (user.isPresent()) {
-            userRepository.save(UserMapper.INSTANCE.toUser(dto));
-            AuthUpdateRequestDto authUpdateRequestDto =UserMapper.INSTANCE.fromUserToAuthUpdateDto(user.get());
-            authManager.updateAuth(authUpdateRequestDto);
+            userRepository.save(UserMapper.INSTANCE.fromUpdateDtoToUserProfile(dto, user.get()));
+            authManager.updateAuth(AuthUpdateRequestDto.builder()
+                            .authId(authId.get())
+                            .email(dto.getEmail())
+                    .build());
             return true;
         }
         throw new UserException(ErrorType.USER_NOT_FOUND);
