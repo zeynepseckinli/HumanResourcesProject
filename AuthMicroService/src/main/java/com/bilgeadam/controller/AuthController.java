@@ -1,15 +1,14 @@
 package com.bilgeadam.controller;
 
-import com.bilgeadam.dto.request.AuthUpdateRequestDto;
-import com.bilgeadam.dto.request.LoginRequestDto;
+import com.bilgeadam.dto.request.*;
 
 import com.bilgeadam.dto.response.LoginResponseDto;
 
-import com.bilgeadam.dto.request.SaveAuthRequestDto;
 import com.bilgeadam.dto.response.SaveAuthResponseDto;
 import com.bilgeadam.repository.entity.Auth;
 
 import com.bilgeadam.service.AuthService;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -54,4 +53,22 @@ public class AuthController {
     public ResponseEntity<Boolean> updateAuth(@RequestBody AuthUpdateRequestDto dto){
         return ResponseEntity.ok(authService.updateAuth(dto));
     }
+
+    @Hidden
+    @PostMapping("/updateRole")
+    public ResponseEntity<Boolean> updateRole(@RequestBody AuthRoleUpdateRequestDto dto){
+        return ResponseEntity.ok(authService.updateRole(dto));
+    }
+
+
+    @PostMapping("/updateState")
+    public ResponseEntity<Boolean> updateAuthState(@RequestBody AuthStateUpdateRequestDto dto){
+        return ResponseEntity.ok(authService.updateAuthState(dto));
+    }
+
+    @PostMapping("/changePassword")
+    public ResponseEntity<Boolean> changePassword(@RequestBody @Valid ChangePasswordDto dto){
+        return ResponseEntity.ok(authService.changePassword(dto));
+    }
+
 }

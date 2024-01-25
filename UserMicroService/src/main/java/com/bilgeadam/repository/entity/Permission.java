@@ -22,12 +22,10 @@ public class Permission extends BaseEntity {
     private String requestUserId; //employee
     private String responseUserId; //manager
     private String permissionType;
-    private LocalDate dateOfRequest;
-    private LocalDate dateOfResponse;
-    private LocalDate startOfPermission;
-    private LocalDate endOfPermission;
+    private LocalDate requestDate;
+    private LocalDate responseDate;
+    private LocalDate permissionStart;
+    private LocalDate permissionEnd;
     private int permissionDuration;
-    private EState permissionState;
-
 
 }

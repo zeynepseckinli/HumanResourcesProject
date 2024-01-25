@@ -1,5 +1,7 @@
 package com.bilgeadam.manager;
 
+import com.bilgeadam.dto.request.AuthRoleUpdateRequestDto;
+import com.bilgeadam.dto.request.AuthStateUpdateRequestDto;
 import com.bilgeadam.dto.request.AuthUpdateRequestDto;
 import com.bilgeadam.dto.request.SaveAuthRequestDto;
 
@@ -21,9 +23,11 @@ public interface AuthManager {
     @PostMapping("/save")
     public ResponseEntity<SaveAuthResponseDto>  save (@RequestBody @Valid SaveAuthRequestDto dto);
 
-//    @GetMapping("/findauthidbyemail")
-//    public ResponseEntity<Long> findAuthIdByEmail(@RequestBody String email);
-
     @PutMapping("/update")
     public ResponseEntity<Boolean> updateAuth(@RequestBody AuthUpdateRequestDto dto);
-}
+
+
+    @PostMapping("/updateRole")
+    public ResponseEntity<Boolean> updateRole(@RequestBody AuthRoleUpdateRequestDto dto);
+
+    }

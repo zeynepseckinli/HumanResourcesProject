@@ -27,6 +27,5 @@ public class Advance extends BaseEntity {
     private String advanceType;
     private LocalDate requestDate;
     private LocalDate responseDate;
-    private EState advanceState;
 
 }

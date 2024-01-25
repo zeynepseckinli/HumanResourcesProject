@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 
 @SuperBuilder
@@ -14,7 +15,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Data
 public class BaseEntity implements Serializable {
-    private Long createDate;
-    private Long updateDate;
+    private LocalDate createDate;
+    private LocalDate updateDate;
     private EState state;
 }

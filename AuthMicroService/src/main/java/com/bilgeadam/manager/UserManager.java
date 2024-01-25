@@ -1,12 +1,11 @@
 package com.bilgeadam.manager;
 
+import com.bilgeadam.dto.request.AuthStateUpdateRequestDto;
 import com.bilgeadam.dto.request.UserSaveRequestDto;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Microservis yapısında sevisleri bir birleri ile iletişime geçebilmeleri içi kullanılan yapıdır.
@@ -22,6 +21,8 @@ public interface UserManager {
     public String getMessage();
     @PostMapping("/save")
     public ResponseEntity<Void> save(@RequestBody @Valid UserSaveRequestDto dto);
+    @PutMapping("/updateUserState")
+    public ResponseEntity<Boolean> updateUserState(@RequestBody @Valid AuthStateUpdateRequestDto dto);
 
 
 }

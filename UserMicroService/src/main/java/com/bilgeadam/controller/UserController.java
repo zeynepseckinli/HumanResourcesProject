@@ -4,6 +4,7 @@ import com.bilgeadam.dto.request.*;
 import com.bilgeadam.dto.response.UserResponseDto;
 import com.bilgeadam.repository.entity.UserProfile;
 import com.bilgeadam.service.UserService;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.query.Update;
@@ -38,7 +39,7 @@ public class UserController {
     }
 
 
-    @PutMapping(UPDATE)
+    @PutMapping("/update")
     @CrossOrigin("*")
     public ResponseEntity<Boolean> update(@RequestBody @Valid UserUpdateRequestDto dto) {
         return ResponseEntity.ok(userService.updateUser(dto));
@@ -48,6 +49,17 @@ public class UserController {
     @CrossOrigin("*")
     public ResponseEntity<UserResponseDto> getProfileByToken(@RequestBody @Valid GetProfileByTokenRequestDto dto) {
         return ResponseEntity.ok(userService.getProfileByToken(dto));
+    }
+
+    @Hidden
+    @PutMapping("/updateUserState")
+    public ResponseEntity<Boolean> updateUserState(@RequestBody @Valid AuthStateUpdateRequestDto dto) {
+        return ResponseEntity.ok(userService.updateUserState(dto));
+    }
+
+    @PutMapping("/updateUserRole")
+    public ResponseEntity<Boolean> updateUserRole(@RequestBody @Valid AuthRoleUpdateRequestDto dto) {
+        return ResponseEntity.ok(userService.updateUserRole(dto));
     }
 
     @PostMapping("/createAdvance")

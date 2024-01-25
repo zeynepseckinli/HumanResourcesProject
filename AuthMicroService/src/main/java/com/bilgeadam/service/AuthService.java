@@ -1,13 +1,7 @@
 package com.bilgeadam.service;
 
-import com.bilgeadam.dto.request.AuthUpdateRequestDto;
-import com.bilgeadam.dto.request.ChangePasswordDto;
-import com.bilgeadam.dto.request.LoginRequestDto;
-
+import com.bilgeadam.dto.request.*;
 import com.bilgeadam.dto.response.LoginResponseDto;
-
-import com.bilgeadam.dto.request.SaveAuthRequestDto;
-
 import com.bilgeadam.exception.AuthException;
 import com.bilgeadam.exception.ErrorType;
 import com.bilgeadam.manager.UserManager;
@@ -17,9 +11,9 @@ import com.bilgeadam.repository.entity.Auth;
 import com.bilgeadam.utility.JwtTokenManager;
 import com.bilgeadam.utility.enums.EState;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -39,6 +33,7 @@ public class AuthService {
             throw new AuthException(ErrorType.ACCOUNT_NOT_ACTIVE);
             //TODO: sifre guncellemeye yonlendirip state.ACTIVE olarak duzenlenecek
             //changePassword metotu kullanılacak
+            //ya da giriş yapılacak ancak pending stateindekiler sadece password değişikliği yaparak active olabilecek
         }
         Optional<String> jwtToken = jwtTokenManager.createToken(authOptional.get().getId(), authOptional.get().getRole(), authOptional.get().getState());
         if(jwtToken.isEmpty())
@@ -60,8 +55,8 @@ public class AuthService {
         });
 
         Auth auth = AuthMapper.INSTANCE.fromDto(dto);
-        auth.setCreateDate(System.currentTimeMillis());
-        auth.setUpdateDate(System.currentTimeMillis());
+        auth.setCreateDate(LocalDate.now());
+        auth.setUpdateDate(LocalDate.now());
         auth.setState(EState.ACTIVE);
         authRepository.save(auth);
         auth.setState(EState.ACTIVE);
@@ -85,8 +80,12 @@ public class AuthService {
         if (!(auth.get().getPassword().equals(dto.getOldPassword()))) {throw new AuthException(ErrorType.PASSWORD_NOT_MATCH);}
         if (!(dto.getNewPassword().equals(dto.getConfirmPassword()))) {throw new AuthException(ErrorType.PASSWORD_NOT_MATCH);}
         auth.get().setPassword(dto.getNewPassword());
-        auth.get().setState(EState.ACTIVE);
+//        auth.get().setState(EState.ACTIVE);
         authRepository.save(auth.get());
+        updateAuthState(AuthStateUpdateRequestDto.builder()
+                .selectedState(EState.ACTIVE)
+                .authId(id.get())
+                .build());
         return true;
     }
 
@@ -100,9 +99,38 @@ public class AuthService {
                 return false; // Güncellenecek Auth bulunamadı durumu
             }
         } catch (Exception e) {
-            // Detaylı hatayı logla
             System.out.println(e);
             return false; // Hata durumu
         }
     }
+
+    public Boolean updateRole(AuthRoleUpdateRequestDto dto){
+        try {
+            Optional<Auth> auth = authRepository.findById(dto.getAuthId());
+            if (auth.isPresent()) {
+                auth.get().setRole(dto.getSelectedRole());
+                authRepository.save(auth.get());
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+        }
+    }
+
+    public Boolean updateAuthState(AuthStateUpdateRequestDto dto){
+        Optional<Auth> auth = authRepository.findById(dto.getAuthId());
+        if (auth.isEmpty()){
+            throw new AuthException(ErrorType.USER_NOT_FOUND);
+        }
+        auth.get().setState(dto.getSelectedState());
+        auth.get().setUpdateDate(LocalDate.now());
+        authRepository.save(auth.get());
+        userManager.updateUserState(dto);
+        return true;
+    }
+
+
 }

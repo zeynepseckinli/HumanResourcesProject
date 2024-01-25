@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Random;
@@ -64,12 +63,10 @@ public class UserService {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         Random random = new Random();
         StringBuilder password = new StringBuilder();
-
         for (int i = 0; i < length; i++) {
             int randomIndex = random.nextInt(characters.length());
             password.append(characters.charAt(randomIndex));
         }
-
         return password.toString();
     }
 
@@ -102,6 +99,29 @@ public class UserService {
         throw new UserException(ErrorType.USER_NOT_FOUND);
     }
 
+    public Boolean updateUserState(AuthStateUpdateRequestDto dto){
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(dto.getAuthId());
+        if (user.isEmpty()){
+            throw new UserException(ErrorType.REQUEST_NOT_FOUND);
+        }
+        user.get().setState(dto.getSelectedState());
+        user.get().setUpdateDate(LocalDate.now());
+        userRepository.save(user.get());
+        return true;
+    }
+
+    public Boolean updateUserRole(AuthRoleUpdateRequestDto dto){
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(dto.getAuthId());
+        if (user.isEmpty()){
+            throw new UserException(ErrorType.REQUEST_NOT_FOUND);
+        }
+        user.get().setRole(dto.getSelectedRole());
+        user.get().setUpdateDate(LocalDate.now());
+        userRepository.save(user.get());
+        authManager.updateRole(dto);
+        return true;
+    }
+
 
     public Boolean createAdvance(CreateAdvanceRequestDto dto) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
@@ -116,7 +136,7 @@ public class UserService {
             throw new UserException(ErrorType.ADVANCE_ERROR);
         }
         Advance advance = AdvanceMapper.INSTANCE.fromDto(dto);
-        advance.setAdvanceState(EState.PENDING);
+        advance.setState(EState.PENDING);
         advanceRepository.save(advance);
         return true;
     }
@@ -126,7 +146,7 @@ public class UserService {
         if(advance.isEmpty()) {
             throw new UserException(ErrorType.REQUEST_NOT_FOUND);
         }
-        advance.get().setAdvanceState(dto.getApprovalState());
+        advance.get().setState(dto.getApprovalState());
         advance.get().setResponseDate(LocalDate.now());
         advanceRepository.save(advance.get());
         return true;
@@ -146,7 +166,7 @@ public class UserService {
 //        permission.setPermissionDuration(dto.getPermissionDuration());
 //        permission.setStartOfPermission(dto.getStartOfPermission());
 //        permission.setEndOfPermission(dto.getEndOfPermission());
-        permission.setPermissionState(EState.PENDING);
+        permission.setState(EState.PENDING);
         permissionRepository.save(permission);
         return true;
     }
@@ -156,8 +176,8 @@ public class UserService {
         if(permission.isEmpty()) {
             throw new UserException(ErrorType.REQUEST_NOT_FOUND);
         }
-        permission.get().setPermissionState(dto.getApprovalState());
-        permission.get().setDateOfResponse(LocalDate.now());
+        permission.get().setState(dto.getApprovalState());
+        permission.get().setResponseDate(LocalDate.now());
         permissionRepository.save(permission.get());
         return true;
     }
