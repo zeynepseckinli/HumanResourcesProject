@@ -27,5 +27,5 @@ public class CreateUserRequestDto {
     private String phone;
     private Long salary;
     private LocalDate birthDate;
-    private String token;
+
 }

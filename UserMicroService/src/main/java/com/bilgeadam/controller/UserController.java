@@ -15,6 +15,7 @@ import static com.bilgeadam.constants.RestApiUrls.*;
 @RestController
 @RequestMapping(USER)
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class UserController {
 
     private final UserService userService;
@@ -24,11 +25,16 @@ public class UserController {
         return "This is User Service";
     }
 
-    @PostMapping(SAVE)
+//    @PostMapping(SAVE)
+//    @CrossOrigin("*")
+//    public ResponseEntity<Void> save(@RequestBody @Valid UserSaveRequestDto dto) {
+//        UserProfile userProfile = userService.saveUser(dto);
+//        return ResponseEntity.ok().build();
+//    }
+    @PostMapping("/createUser")
     @CrossOrigin("*")
-    public ResponseEntity<Void> save(@RequestBody @Valid UserSaveRequestDto dto) {
-        UserProfile userProfile = userService.saveUser(dto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Boolean> createUser(@RequestBody @Valid CreateUserRequestDto dto){
+        return ResponseEntity.ok(userService.createUser(dto));
     }
 
 
@@ -51,7 +57,7 @@ public class UserController {
 
 
     @PostMapping("/createPermission")
-    public ResponseEntity<?> createPermission(@RequestBody @Valid CreatePermissionRequestDto dto) {
+    public ResponseEntity<Boolean> createPermission(@RequestBody @Valid CreatePermissionRequestDto dto) {
         return ResponseEntity.ok(userService.createPermission(dto));
     }
 }

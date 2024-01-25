@@ -1,9 +1,9 @@
 package com.bilgeadam.service;
 
+import com.bilgeadam.dto.request.AuthUpdateRequestDto;
 import com.bilgeadam.dto.request.ChangePasswordDto;
-import com.bilgeadam.dto.request.UserSaveRequestDto;
 import com.bilgeadam.dto.request.LoginRequestDto;
-import com.bilgeadam.dto.request.RegisterRequestDto;
+import com.bilgeadam.dto.request.SaveAuthRequestDto;
 import com.bilgeadam.exception.AuthException;
 import com.bilgeadam.exception.ErrorType;
 import com.bilgeadam.manager.UserManager;
@@ -41,7 +41,7 @@ public class AuthService {
         return jwtToken.get();
     }
 
-    public void register(RegisterRequestDto dto) {
+    public Auth save(SaveAuthRequestDto dto) {
         authRepository.findOptionalByEmail(dto.getEmail())
           .ifPresent(auth->{
             throw new AuthException(ErrorType.USERNAME_DUPLICATE);
@@ -51,13 +51,17 @@ public class AuthService {
         auth.setCreateDate(System.currentTimeMillis());
         auth.setUpdateDate(System.currentTimeMillis());
         auth.setState(State.ACTIVE);
-        authRepository.save(auth);
+        return authRepository.save(auth);
 
-                userManager.save(UserSaveRequestDto.builder()
-                        .authId(auth.getId())
-                        .email(auth.getEmail())
-                .build());
+//                userManager.save(UserSaveRequestDto.builder()
+//                        .authId(auth.getId())
+//                        .email(auth.getEmail())
+//                .build());
     }
+
+//    public Long findAuthIdByEmail(String email){
+//        return authRepository.findAuthIdByEmail(email);
+//    }
 
     public Boolean changePassword(ChangePasswordDto dto){
         Optional<Long> id= jwtTokenManager.getIdByToken(dto.getJwtToken());
@@ -72,4 +76,11 @@ public class AuthService {
         return true;
     }
 
+    public Boolean updateAuth(AuthUpdateRequestDto dto) {
+        Optional<Auth> auth = authRepository.findById(dto.getAuthId());
+        if (auth.isPresent()){
+            authRepository.save(AuthMapper.INSTANCE.fromAuthUpdateRequestDto(dto,auth.get()));
+        }
+        throw new RuntimeException("Hata");
+    }
 }

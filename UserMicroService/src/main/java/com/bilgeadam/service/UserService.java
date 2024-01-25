@@ -1,9 +1,11 @@
 package com.bilgeadam.service;
 
 import com.bilgeadam.dto.request.*;
+import com.bilgeadam.dto.response.SaveAuthResponseDto;
 import com.bilgeadam.dto.response.UserResponseDto;
 import com.bilgeadam.exception.ErrorType;
 import com.bilgeadam.exception.UserException;
+import com.bilgeadam.manager.AuthManager;
 import com.bilgeadam.mapper.AdvanceMapper;
 import com.bilgeadam.mapper.PermissionMapper;
 import com.bilgeadam.mapper.UserMapper;
@@ -16,9 +18,11 @@ import com.bilgeadam.repository.entity.UserProfile;
 import com.bilgeadam.utility.JwtTokenManager;
 import com.bilgeadam.utility.enums.State;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -26,21 +30,45 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final AdvanceRepository advanceRepository;
-
+    private final AuthManager authManager;
     private final JwtTokenManager jwtTokenManager;
     private final PermissionRepository permissionRepository;
 
-    public UserProfile saveUser(UserSaveRequestDto dto) {
-        return userRepository.save(UserProfile.builder()
-                .email(dto.getEmail())
-                .authId(dto.getAuthId())
-                .build());
-    }
+//    public UserProfile saveUser(UserSaveRequestDto dto) {
+//        return userRepository.save(UserProfile.builder()
+//                .email(dto.getEmail())
+//                .authId(dto.getAuthId())
+//                .build());
+//    }
 
     public Boolean createUser(CreateUserRequestDto dto){
+        userRepository.findOptionalByEmail(dto.getEmail())
+                .ifPresent(userProfile -> {
+                    throw new UserException(ErrorType.USERNAME_DUPLICATE);
+                });
+        //auth save
+        ResponseEntity<SaveAuthResponseDto> authDto = authManager.save(SaveAuthRequestDto.builder()
+                        .email(dto.getEmail())
+                        .password(generateRandomPassword(8))
+                .build());
+        SaveAuthResponseDto saveAuthResponseDto = authDto.getBody();
         UserProfile user = UserMapper.INSTANCE.fromCreateUserRequestDto(dto);
+        user.setAuthId(saveAuthResponseDto.getAuthId());
         userRepository.save(user);
         return true;
+    }
+
+    public static String generateRandomPassword(int length) {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        StringBuilder password = new StringBuilder();
+
+        for (int i = 0; i < length; i++) {
+            int randomIndex = random.nextInt(characters.length());
+            password.append(characters.charAt(randomIndex));
+        }
+
+        return password.toString();
     }
 
     public UserResponseDto getProfileByToken(GetProfileByTokenRequestDto dto) {
@@ -61,11 +89,13 @@ public class UserService {
             throw new UserException(ErrorType.INVALID_TOKEN);
         }
         Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
-        if (user.isEmpty()) {
-            throw new UserException(ErrorType.USER_NOT_FOUND);
+        if (user.isPresent()) {
+            userRepository.save(UserMapper.INSTANCE.toUser(dto));
+            AuthUpdateRequestDto authUpdateRequestDto =UserMapper.INSTANCE.fromUserToAuthUpdateDto(user.get());
+            authManager.updateAuth(authUpdateRequestDto);
+            return true;
         }
-        userRepository.save(UserMapper.INSTANCE.toUser(dto));
-        return true;
+        throw new UserException(ErrorType.USER_NOT_FOUND);
     }
 
 

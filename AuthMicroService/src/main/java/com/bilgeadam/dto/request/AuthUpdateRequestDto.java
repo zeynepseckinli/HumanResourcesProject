@@ -1,15 +1,16 @@
-package com.bilgeadam.dto.response;
+package com.bilgeadam.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class RegisterResponseDto {
-    boolean isRegister;
-    String message;
+@Builder
+public class AuthUpdateRequestDto {
+    private Long authId;
+    private String email;
+
 }
