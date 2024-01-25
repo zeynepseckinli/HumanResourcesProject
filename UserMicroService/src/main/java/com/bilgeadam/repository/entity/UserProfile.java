@@ -22,7 +22,6 @@ public class UserProfile extends BaseEntity {
     @Id
     private String id;
     private Long authId;
-    private ERole role;
     private String name;
     private String secondName;
     private String surname;
@@ -38,6 +37,8 @@ public class UserProfile extends BaseEntity {
     private String phone;
     @Builder.Default
     private Long salary = 0L;
+    @Builder.Default
+    private ERole role=ERole.EMPLOYEE;
     private LocalDate birthDate;
     private LocalDate jobStart;
     private LocalDate jobEnd;
