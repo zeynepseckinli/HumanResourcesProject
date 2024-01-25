@@ -1,6 +1,6 @@
 package com.bilgeadam.dto.request;
 
-import com.bilgeadam.utility.enums.State;
+import com.bilgeadam.utility.enums.EState;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +21,7 @@ public class CreatePermissionRequestDto {
     private LocalDate startOfPermission;
     private LocalDate endOfPermission;
     private int permissionDuration;
-    private State permissionState;
+    private EState permissionState;
 
 }
 

@@ -1,9 +1,14 @@
 package com.bilgeadam.controller;
 
+import com.bilgeadam.dto.request.AuthUpdateRequestDto;
 import com.bilgeadam.dto.request.LoginRequestDto;
-import com.bilgeadam.dto.request.RegisterRequestDto;
+
 import com.bilgeadam.dto.response.LoginResponseDto;
-import com.bilgeadam.dto.response.RegisterResponseDto;
+
+import com.bilgeadam.dto.request.SaveAuthRequestDto;
+import com.bilgeadam.dto.response.SaveAuthResponseDto;
+import com.bilgeadam.repository.entity.Auth;
+
 import com.bilgeadam.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +20,7 @@ import static com.bilgeadam.constants.RestApiUrls.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(AUTH)
+@CrossOrigin("*")
 public class AuthController {
 
     private final AuthService authService;
@@ -30,12 +36,22 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(dto));
     }
 
-    @PostMapping(REGISTER)
-    public ResponseEntity<RegisterResponseDto>  register (@RequestBody @Valid RegisterRequestDto dto){
-        authService.register(dto);
-        return ResponseEntity.ok(RegisterResponseDto.builder()
-                        .isRegister(true)
+    @PostMapping("/save")
+    public ResponseEntity<SaveAuthResponseDto>  save (@RequestBody @Valid SaveAuthRequestDto dto){
+        Auth auth= authService.save(dto);
+        return ResponseEntity.ok(SaveAuthResponseDto.builder()
+                        .isSave(true)
                         .message("Saved successfully")
+                        .authId(auth.getId())
                 .build());
+    }
+//    @PostMapping("/findauthidbyemail")
+//    @CrossOrigin("*")
+//    public ResponseEntity<Long> findAuthIdByEmail(@RequestBody String email){
+//        return ResponseEntity.ok(authService.findAuthIdByEmail(email));
+//    }
+    @PutMapping("/update")
+    public ResponseEntity<Boolean> updateAuth(@RequestBody AuthUpdateRequestDto dto){
+        return ResponseEntity.ok(authService.updateAuth(dto));
     }
 }

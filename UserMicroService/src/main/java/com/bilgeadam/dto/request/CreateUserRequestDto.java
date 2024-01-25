@@ -11,8 +11,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class UserUpdateRequestDto {
-    private String token;
+public class CreateUserRequestDto {
     private String name;
     private String secondName;
     private String surname;
@@ -28,7 +27,5 @@ public class UserUpdateRequestDto {
     private String phone;
     private Long salary;
     private LocalDate birthDate;
-    private LocalDate jobStart;
-    private LocalDate jobEnd;
-    private String avatar;
+
 }

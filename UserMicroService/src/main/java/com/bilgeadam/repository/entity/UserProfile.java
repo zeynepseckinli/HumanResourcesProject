@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 
@@ -41,4 +42,6 @@ public class UserProfile extends BaseEntity {
     private LocalDate jobStart;
     private LocalDate jobEnd;
     private String avatar;
+
+
 }

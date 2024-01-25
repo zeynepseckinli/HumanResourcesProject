@@ -1,5 +1,7 @@
 package com.bilgeadam.mapper;
 
+import com.bilgeadam.dto.request.AuthUpdateRequestDto;
+import com.bilgeadam.dto.request.CreateUserRequestDto;
 import com.bilgeadam.dto.request.UserSaveRequestDto;
 import com.bilgeadam.dto.request.UserUpdateRequestDto;
 import com.bilgeadam.dto.response.UserResponseDto;
@@ -16,6 +18,8 @@ public interface UserMapper {
     UserResponseDto toUserResponseDto(final UserProfile userProfile);
     UserResponseDto fromUserUpdateRequestDto(final UserUpdateRequestDto dto);
     UserProfile toUser (final UserUpdateRequestDto dto);
+    UserProfile fromCreateUserRequestDto(final CreateUserRequestDto dto);
+    AuthUpdateRequestDto fromUserToAuthUpdateDto(UserProfile user);
 
 }
 
