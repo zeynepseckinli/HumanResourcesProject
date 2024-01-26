@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(url = "http://localhost:9090/api/v1/auth",name = "authManager")
+@FeignClient(url = "http://localhost:9090/api/v1/auth", name = "authManager")
 public interface AuthManager {
 
     @GetMapping("/getmessage")
     public String getMessage();
 
     @PostMapping("/save")
-    public ResponseEntity<SaveAuthResponseDto>  save (@RequestBody @Valid SaveAuthRequestDto dto);
+    public ResponseEntity<SaveAuthResponseDto> save(@RequestBody @Valid SaveAuthRequestDto dto);
 
     @PutMapping("/update")
     public ResponseEntity<Boolean> updateAuth(@RequestBody AuthUpdateRequestDto dto);
@@ -30,4 +30,4 @@ public interface AuthManager {
     @PostMapping("/updateRole")
     public ResponseEntity<Boolean> updateRole(@RequestBody AuthRoleUpdateRequestDto dto);
 
-    }
+}

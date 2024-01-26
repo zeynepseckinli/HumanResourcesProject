@@ -25,18 +25,18 @@ public class AuthService {
     private final UserManager userManager;
 
     public LoginResponseDto login(LoginRequestDto dto) {
-        Optional<Auth> authOptional =  authRepository.findOptionalByEmailAndPassword(dto.getEmail(),dto.getPassword());
-        if(authOptional.isEmpty()){
+        Optional<Auth> authOptional = authRepository.findOptionalByEmailAndPassword(dto.getEmail(), dto.getPassword());
+        if (authOptional.isEmpty()) {
             throw new AuthException(ErrorType.LOGIN_ERROR);
         }
-        if(!authOptional.get().getState().equals(EState.ACTIVE)){
+        if (!authOptional.get().getState().equals(EState.ACTIVE)) {
             throw new AuthException(ErrorType.ACCOUNT_NOT_ACTIVE);
             //TODO: sifre guncellemeye yonlendirip state.ACTIVE olarak duzenlenecek
             //changePassword metotu kullanılacak
             //ya da giriş yapılacak ancak pending stateindekiler sadece password değişikliği yaparak active olabilecek
         }
         Optional<String> jwtToken = jwtTokenManager.createToken(authOptional.get().getId(), authOptional.get().getRole(), authOptional.get().getState());
-        if(jwtToken.isEmpty())
+        if (jwtToken.isEmpty())
             throw new AuthException(ErrorType.TOKEN_ERROR);
 
         LoginResponseDto loginResponseDto = LoginResponseDto.builder()
@@ -50,9 +50,9 @@ public class AuthService {
 
     public Auth save(SaveAuthRequestDto dto) {
         authRepository.findOptionalByEmail(dto.getEmail())
-          .ifPresent(auth->{
-            throw new AuthException(ErrorType.USERNAME_DUPLICATE);
-        });
+                .ifPresent(auth -> {
+                    throw new AuthException(ErrorType.USERNAME_DUPLICATE);
+                });
 
         Auth auth = AuthMapper.INSTANCE.fromDto(dto);
         auth.setCreateDate(LocalDate.now());
@@ -72,13 +72,21 @@ public class AuthService {
 //        return authRepository.findAuthIdByEmail(email);
 //    }
 
-    public Boolean changePassword(ChangePasswordDto dto){
-        Optional<Long> id= jwtTokenManager.getIdByToken(dto.getJwtToken());
-        if (id.isEmpty()) {throw new AuthException(ErrorType.INVALID_TOKEN);}
-        Optional<Auth> auth= authRepository.findOptionalById(id.get());
-        if (auth.isEmpty() ) { throw new AuthException(ErrorType.USER_NOT_FOUND);}
-        if (!(auth.get().getPassword().equals(dto.getOldPassword()))) {throw new AuthException(ErrorType.PASSWORD_NOT_MATCH);}
-        if (!(dto.getNewPassword().equals(dto.getConfirmPassword()))) {throw new AuthException(ErrorType.PASSWORD_NOT_MATCH);}
+    public Boolean changePassword(ChangePasswordDto dto) {
+        Optional<Long> id = jwtTokenManager.getIdByToken(dto.getJwtToken());
+        if (id.isEmpty()) {
+            throw new AuthException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<Auth> auth = authRepository.findOptionalById(id.get());
+        if (auth.isEmpty()) {
+            throw new AuthException(ErrorType.USER_NOT_FOUND);
+        }
+        if (!(auth.get().getPassword().equals(dto.getOldPassword()))) {
+            throw new AuthException(ErrorType.PASSWORD_NOT_MATCH);
+        }
+        if (!(dto.getNewPassword().equals(dto.getConfirmPassword()))) {
+            throw new AuthException(ErrorType.PASSWORD_NOT_MATCH);
+        }
         auth.get().setPassword(dto.getNewPassword());
 //        auth.get().setState(EState.ACTIVE);
         authRepository.save(auth.get());
@@ -104,7 +112,7 @@ public class AuthService {
         }
     }
 
-    public Boolean updateRole(AuthRoleUpdateRequestDto dto){
+    public Boolean updateRole(AuthRoleUpdateRequestDto dto) {
         try {
             Optional<Auth> auth = authRepository.findById(dto.getAuthId());
             if (auth.isPresent()) {
@@ -120,9 +128,9 @@ public class AuthService {
         }
     }
 
-    public Boolean updateAuthState(AuthStateUpdateRequestDto dto){
+    public Boolean updateAuthState(AuthStateUpdateRequestDto dto) {
         Optional<Auth> auth = authRepository.findById(dto.getAuthId());
-        if (auth.isEmpty()){
+        if (auth.isEmpty()) {
             throw new AuthException(ErrorType.USER_NOT_FOUND);
         }
         auth.get().setState(dto.getSelectedState());
@@ -133,4 +141,7 @@ public class AuthService {
     }
 
 
+    public Optional<Auth> findById(Long id) {
+        return authRepository.findById(id);
+    }
 }

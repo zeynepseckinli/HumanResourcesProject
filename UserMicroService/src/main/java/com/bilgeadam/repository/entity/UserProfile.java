@@ -38,7 +38,7 @@ public class UserProfile extends BaseEntity {
     @Builder.Default
     private Long salary = 0L;
     @Builder.Default
-    private ERole role=ERole.EMPLOYEE;
+    private ERole role = ERole.EMPLOYEE;
     private LocalDate birthDate;
     private LocalDate jobStart;
     private LocalDate jobEnd;

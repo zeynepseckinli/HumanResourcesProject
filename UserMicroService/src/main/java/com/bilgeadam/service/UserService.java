@@ -183,5 +183,7 @@ public class UserService {
     }
 
 
-
+    public Optional<UserProfile> findByAuthId(Long authId) {
+        return userRepository.findOptionalByAuthId(authId);
+    }
 }
