@@ -1,6 +1,5 @@
 package com.bilgeadam.repository.entity;
 
-import com.bilgeadam.utility.enums.EState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

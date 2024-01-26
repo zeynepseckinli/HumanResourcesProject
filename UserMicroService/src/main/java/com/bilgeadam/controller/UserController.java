@@ -1,7 +1,7 @@
 package com.bilgeadam.controller;
 
 import com.bilgeadam.dto.request.*;
-import com.bilgeadam.dto.response.UserResponseDto;
+import com.bilgeadam.dto.response.*;
 import com.bilgeadam.repository.entity.UserProfile;
 import com.bilgeadam.service.UserService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 import static com.bilgeadam.constants.RestApiUrls.*;
 
@@ -65,9 +66,9 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUserRole(dto));
     }
 
-    @PostMapping(value = "/imageUpload", consumes = "multipart/form-data")
-    public ResponseEntity<String> updateImage(@RequestParam("file") MultipartFile file, @RequestParam("token") String token) throws IOException {
-        return ResponseEntity.ok(userService.updateImage(file, token));
+    @PostMapping(value = "/updateUserImage", consumes = "multipart/form-data")
+    public ResponseEntity<String> updateUserImage(@RequestParam("file") MultipartFile file, @RequestParam("token") String token) throws IOException {
+        return ResponseEntity.ok(userService.updateUserImage(file, token));
     }
 
 
@@ -81,15 +82,35 @@ public class UserController {
         return ResponseEntity.ok(userService.updateAdvanceState(dto));
     }
 
+    @GetMapping("/findAllAdvancesForRequestUser")
+    public ResponseEntity<List<AdvanceListResponseDtoForRequestUser>> findAllAdvancesForRequestUser(String token){
+        return ResponseEntity.ok(userService.findAllAdvancesForRequestUser(token));
+    }
+
+    @GetMapping("/findAllAdvancesForResponseUser")
+    public ResponseEntity<List<AdvanceListResponseDtoForResponseUser>> findAllAdvancesForResponseUser(String token){
+        return ResponseEntity.ok(userService.findAllAdvancesForResponseUser(token));
+    }
+
 
     @PostMapping("/createPermission")
     public ResponseEntity<Boolean> createPermission(@RequestBody @Valid CreatePermissionRequestDto dto) {
         return ResponseEntity.ok(userService.createPermission(dto));
     }
 
-    @PostMapping("/updatePermissionState")
+    @PutMapping("/updatePermissionState")
     public ResponseEntity<Boolean> updatePermissionState(@RequestBody UpdateStateRequestDto dto){
         return ResponseEntity.ok(userService.updatePermissionState(dto));
+    }
+
+    @GetMapping("/findAllPermissionsForRequestUser")
+    public ResponseEntity<List<PermissionListResponseDtoForRequestUser>> findAllPermissionsForRequestUser(String token){
+        return ResponseEntity.ok(userService.findAllPermissionsForRequestUser(token));
+    }
+
+    @GetMapping("/findAllPermissionsForResponseUser")
+    public ResponseEntity<List<PermissionListResponseDtoForResponseUser>> findAllPermissionsForResponseUser(String token){
+        return ResponseEntity.ok(userService.findAllPermissionsForResponseUser(token));
     }
 
 }
