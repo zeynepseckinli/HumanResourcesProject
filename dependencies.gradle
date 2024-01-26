@@ -8,7 +8,8 @@ ext {
             mapstruct           : "1.5.5.Final",
             swaggerui           : "2.1.0",
             postgresql          : "42.6.0",
-            jwt                 : "4.4.0"
+            jwt                 : "4.4.0",
+            cloudinary          : "1.34.0"
     ]
 
     libs = [
@@ -42,7 +43,9 @@ ext {
 
             postgresql                 : "org.postgresql:postgresql:$versions.postgresql",
 
-            jwt                        : "com.auth0:java-jwt:$versions.jwt"
+            jwt                        : "com.auth0:java-jwt:$versions.jwt",
+
+            springCloudinary            : "com.cloudinary:cloudinary-http44:$versions.cloudinary"
 
 
 

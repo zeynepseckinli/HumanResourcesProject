@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 import static com.bilgeadam.constants.RestApiUrls.*;
 
@@ -61,6 +64,12 @@ public class UserController {
     public ResponseEntity<Boolean> updateUserRole(@RequestBody @Valid AuthRoleUpdateRequestDto dto) {
         return ResponseEntity.ok(userService.updateUserRole(dto));
     }
+
+    @PostMapping(value = "/imageUpload", consumes = "multipart/form-data")
+    public ResponseEntity<String> updateImage(@RequestParam("file") MultipartFile file, @RequestParam("token") String token) throws IOException {
+        return ResponseEntity.ok(userService.updateImage(file, token));
+    }
+
 
     @PostMapping("/createAdvance")
     public ResponseEntity<Boolean> createAdvance(@RequestBody @Valid CreateAdvanceRequestDto dto) {

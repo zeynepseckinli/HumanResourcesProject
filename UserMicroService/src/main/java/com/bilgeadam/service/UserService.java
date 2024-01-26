@@ -1,5 +1,6 @@
 package com.bilgeadam.service;
 
+import com.bilgeadam.config.CloudinaryConfig;
 import com.bilgeadam.dto.request.*;
 import com.bilgeadam.dto.response.SaveAuthResponseDto;
 import com.bilgeadam.dto.response.UserResponseDto;
@@ -17,11 +18,16 @@ import com.bilgeadam.repository.entity.Permission;
 import com.bilgeadam.repository.entity.UserProfile;
 import com.bilgeadam.utility.JwtTokenManager;
 import com.bilgeadam.utility.enums.EState;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
@@ -34,6 +40,7 @@ public class UserService {
     private final AuthManager authManager;
     private final JwtTokenManager jwtTokenManager;
     private final PermissionRepository permissionRepository;
+    private final CloudinaryConfig cloudinaryConfig;
 
 //    public UserProfile saveUser(UserSaveRequestDto dto) {
 //        return userRepository.save(UserProfile.builder()
@@ -183,5 +190,35 @@ public class UserService {
     }
 
 
+    public String updateImage(MultipartFile file, String token){
+        Optional<Long> authId = jwtTokenManager.getIdByToken(token);
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+        if (user.isEmpty()) {
+            throw new UserException(ErrorType.USER_NOT_FOUND);
+        }
+        String url = imageUpload(file);
+        return url;
+    }
 
+
+    public String imageUpload(MultipartFile file){
+        Map<String, String> config = new HashMap<>();
+        config.put("cloud_name", cloudinaryConfig.getCloud_name());
+        config.put("api_key", cloudinaryConfig.getApi_key());
+        config.put("api_secret", cloudinaryConfig.getApi_secret());
+
+        Cloudinary cloudinary = new Cloudinary(config);
+
+        try {
+            Map<?,?> result = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            String url = (String) result.get("url");
+            return url;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
