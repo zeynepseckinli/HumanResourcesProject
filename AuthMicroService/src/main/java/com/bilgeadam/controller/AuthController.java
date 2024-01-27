@@ -26,6 +26,7 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/getmessage")
+ //   @PreAuthorize("hasAuthority('EMPLOYEE')") //Yetkilendirme verme
     public String getMessage() {
         return "This is Auth Service";
     }

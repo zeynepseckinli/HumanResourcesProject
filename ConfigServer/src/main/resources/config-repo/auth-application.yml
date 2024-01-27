@@ -16,6 +16,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  security:
+    user:
+      name: grupsurup
+      password: 123456
+
 my-application:
   user-end-point: http://localhost:9092/user
   secret-key: "bAjAfl&ato9ruwrichlyUc1Lfaprafr8soNoCr!BramaTR7mojicr1wRI0*oC3is"

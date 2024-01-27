@@ -31,8 +31,8 @@ public class JwtUserDetails implements UserDetailsService {
     public UserDetails loadUserByUserId(Long id) throws UsernameNotFoundException {
         Optional<Auth> auth = authService.findById(id);
         if (auth.isPresent()) {
-            List<GrantedAuthority> authorityList = new ArrayList<>();
-            authorityList.add(new SimpleGrantedAuthority(auth.get().getRole().name()));
+            List<GrantedAuthority> authorityList = new ArrayList<>();//tanımlanan izinler
+            authorityList.add(new SimpleGrantedAuthority(auth.get().getRole().toString()));
             return User.builder()
                     .username(auth.get().getEmail())
                     .password("")
