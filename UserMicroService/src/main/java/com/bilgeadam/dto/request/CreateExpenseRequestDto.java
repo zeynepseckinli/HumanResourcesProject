@@ -11,12 +11,12 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CreateAdvanceRequestDto {
+public class CreateExpenseRequestDto {
     private String token;
     private String responseUserId;
-    private Long advanceAmount;
-    private String unitOfCurrency;
-    private String description;
-    private String advanceType;
     private LocalDate requestDate;
+    private String description;
+    private Double expenseAmount;
+    private String expenseType;
+    private String unitOfCurrency;
 }

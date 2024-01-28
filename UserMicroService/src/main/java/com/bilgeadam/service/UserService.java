@@ -7,12 +7,15 @@ import com.bilgeadam.exception.ErrorType;
 import com.bilgeadam.exception.UserException;
 import com.bilgeadam.manager.AuthManager;
 import com.bilgeadam.mapper.AdvanceMapper;
+import com.bilgeadam.mapper.ExpenseMapper;
 import com.bilgeadam.mapper.PermissionMapper;
 import com.bilgeadam.mapper.UserMapper;
 import com.bilgeadam.repository.AdvanceRepository;
+import com.bilgeadam.repository.ExpenseRepository;
 import com.bilgeadam.repository.PermissionRepository;
 import com.bilgeadam.repository.UserRepository;
 import com.bilgeadam.repository.entity.Advance;
+import com.bilgeadam.repository.entity.Expense;
 import com.bilgeadam.repository.entity.Permission;
 import com.bilgeadam.repository.entity.UserProfile;
 import com.bilgeadam.utility.JwtTokenManager;
@@ -38,6 +41,7 @@ public class UserService {
     private final JwtTokenManager jwtTokenManager;
     private final PermissionRepository permissionRepository;
     private final CloudinaryConfig cloudinaryConfig;
+    private final ExpenseRepository expenseRepository;
 
 //    public UserProfile saveUser(UserSaveRequestDto dto) {
 //        return userRepository.save(UserProfile.builder()
@@ -172,7 +176,7 @@ public class UserService {
             throw new UserException(ErrorType.USER_NOT_FOUND);
         }
         if (dto.getAdvanceAmount() > user.get().getSalary() * 3) {
-            throw new UserException(ErrorType.ADVANCE_ERROR);
+                throw new UserException(ErrorType.ADVANCE_ERROR);
         }
         Advance advance = AdvanceMapper.INSTANCE.fromDto(dto);
         advance.setRequestUserId(user.get().getId());
@@ -202,16 +206,7 @@ public class UserService {
             throw new UserException(ErrorType.USER_NOT_FOUND);
         }
         return advanceRepository.findAllByRequestUserId(user.get().getId()).stream().map(advance -> {
-            return AdvanceListResponseDtoForRequestUser.builder()
-                    .advanceAmount(advance.getAdvanceAmount())
-                    .unitOfCurrency(advance.getUnitOfCurrency())
-                    .description(advance.getDescription())
-                    .advanceType(advance.getAdvanceType())
-                    .requestDate(advance.getRequestDate())
-                    .responseDate(advance.getResponseDate())
-                    .responseUserId(advance.getResponseUserId())
-                    .state(advance.getState())
-                    .build();
+            return AdvanceMapper.INSTANCE.toDtoForRequestUser(advance);
         }).collect(Collectors.toList());
     }
 
@@ -225,24 +220,15 @@ public class UserService {
             throw new UserException(ErrorType.USER_NOT_FOUND);
         }
         return advanceRepository.findAllByResponseUserId(user.get().getId()).stream().map(advance -> {
-            AdvanceListResponseDtoForResponseUser advanceListResponseDtoForResponseUser = AdvanceListResponseDtoForResponseUser.builder()
-                    .requestUserId(advance.getRequestUserId())
-                    .advanceAmount(advance.getAdvanceAmount())
-                    .unitOfCurrency(advance.getUnitOfCurrency())
-                    .description(advance.getDescription())
-                    .advanceType(advance.getAdvanceType())
-                    .requestDate(advance.getRequestDate())
-                    .responseDate(advance.getResponseDate())
-                    .state(advance.getState())
-                    .build();
-            UserProfile requestUser = userRepository.findById(advanceListResponseDtoForResponseUser.getRequestUserId()).get();
-            advanceListResponseDtoForResponseUser.setName(requestUser.getName());
-            advanceListResponseDtoForResponseUser.setSecondName(requestUser.getSecondName());
-            advanceListResponseDtoForResponseUser.setSurname(requestUser.getSurname());
-            advanceListResponseDtoForResponseUser.setSecondSurname(requestUser.getSecondSurname());
-            advanceListResponseDtoForResponseUser.setEmail(requestUser.getEmail());
-            advanceListResponseDtoForResponseUser.setSalary(requestUser.getSalary());
-            return advanceListResponseDtoForResponseUser;
+            AdvanceListResponseDtoForResponseUser advanceList = AdvanceMapper.INSTANCE.toDtoForResponseUser(advance);
+            UserProfile requestUser = userRepository.findById(advanceList.getRequestUserId()).get();
+            advanceList.setName(requestUser.getName());
+            advanceList.setSecondName(requestUser.getSecondName());
+            advanceList.setSurname(requestUser.getSurname());
+            advanceList.setSecondSurname(requestUser.getSecondSurname());
+            advanceList.setEmail(requestUser.getEmail());
+            advanceList.setSalary(requestUser.getSalary());
+            return advanceList;
         }).collect(Collectors.toList());
     }
 
@@ -284,16 +270,7 @@ public class UserService {
             throw new UserException(ErrorType.USER_NOT_FOUND);
         }
         return permissionRepository.findAllByRequestUserId(user.get().getId()).stream().map(permission -> {
-            return PermissionListResponseDtoForRequestUser.builder()
-                    .responseUserId(permission.getResponseUserId())
-                    .permissionType(permission.getPermissionType())
-                    .permissionStart(permission.getPermissionStart())
-                    .permissionEnd(permission.getPermissionEnd())
-                    .requestDate(permission.getRequestDate())
-                    .responseDate(permission.getResponseDate())
-                    .permissionDuration(permission.getPermissionDuration())
-                    .state(permission.getState())
-                    .build();
+            return PermissionMapper.INSTANCE.toDtoForRequestUser(permission);
         }).collect(Collectors.toList());
     }
 
@@ -307,26 +284,79 @@ public class UserService {
             throw new UserException(ErrorType.USER_NOT_FOUND);
         }
         return permissionRepository.findAllByResponseUserId(user.get().getId()).stream().map(permission -> {
-            PermissionListResponseDtoForResponseUser permissionListResponseDtoForResponseUser = PermissionListResponseDtoForResponseUser.builder()
-                    .requestUserId(permission.getRequestUserId())
-                    .permissionType(permission.getPermissionType())
-                    .permissionStart(permission.getPermissionStart())
-                    .permissionEnd(permission.getPermissionEnd())
-                    .permissionDuration(permission.getPermissionDuration())
-                    .requestDate(permission.getRequestDate())
-                    .responseDate(permission.getResponseDate())
-                    .state(permission.getState())
-                    .build();
-            UserProfile requestUser = userRepository.findById(permissionListResponseDtoForResponseUser.getRequestUserId()).get();
-            permissionListResponseDtoForResponseUser.setName(requestUser.getName());
-            permissionListResponseDtoForResponseUser.setSecondName(requestUser.getSecondName());
-            permissionListResponseDtoForResponseUser.setSurname(requestUser.getSurname());
-            permissionListResponseDtoForResponseUser.setSecondSurname(requestUser.getSecondSurname());
-            permissionListResponseDtoForResponseUser.setEmail(requestUser.getEmail());
-            return permissionListResponseDtoForResponseUser;
+            PermissionListResponseDtoForResponseUser permissionList = PermissionMapper.INSTANCE.toDtoForResponseUser(permission);
+            UserProfile requestUser = userRepository.findById(permissionList.getRequestUserId()).get();
+            permissionList.setName(requestUser.getName());
+            permissionList.setSecondName(requestUser.getSecondName());
+            permissionList.setSurname(requestUser.getSurname());
+            permissionList.setSecondSurname(requestUser.getSecondSurname());
+            permissionList.setEmail(requestUser.getEmail());
+            return permissionList;
         }).collect(Collectors.toList());
     }
 
+    public Boolean createExpense(MultipartFile file, CreateExpenseRequestDto dto) {
+        Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+        if (user.isEmpty()) {
+            throw new UserException(ErrorType.USER_NOT_FOUND);
+        }
+        String url = imageUpload(file);
+        Expense expense = ExpenseMapper.INSTANCE.fromDto(dto);
+        expense.setRequestUserId(user.get().getId());
+        expense.setState(EState.PENDING);
+        expense.setUrl(url);
+        expenseRepository.save(expense);
+        return true;
+    }
 
+    public Boolean updateExpenseState(UpdateStateRequestDto dto) {
+        Optional<Expense> expense = expenseRepository.findById(dto.getId());
+        if(expense.isEmpty()) {
+            throw new UserException(ErrorType.REQUEST_NOT_FOUND);
+        }
+        expense.get().setState(dto.getSelectedState());
+        expense.get().setResponseDate(LocalDate.now());
+        expenseRepository.save(expense.get());
+        return true;
+    }
+
+    public List<ExpensesListResponseDtoForRequestUser> findAllExpensesForRequestUser (String token) {
+        Optional<Long> authId = jwtTokenManager.getIdByToken(token);
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+        if (user.isEmpty()) {
+            throw new UserException(ErrorType.USER_NOT_FOUND);
+        }
+        return expenseRepository.findAllByRequestUserId(user.get().getId()).stream().map(expense -> {
+            return ExpenseMapper.INSTANCE.toDtoForRequestUser(expense);
+        }).collect(Collectors.toList());
+    }
+
+    public List<ExpensesListResponseDtoForResponseUser> findAllExpensesForResponseUser (String token) {
+        Optional<Long> authId = jwtTokenManager.getIdByToken(token);
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+        if (user.isEmpty()) {
+            throw new UserException(ErrorType.USER_NOT_FOUND);
+        }
+        return expenseRepository.findAllByResponseUserId(user.get().getId()).stream().map(expense -> {
+            ExpensesListResponseDtoForResponseUser expensesList = ExpenseMapper.INSTANCE.toDtoForResponseUser(expense);
+            UserProfile requestUser = userRepository.findById(expensesList.getRequestUserId()).get();
+            expensesList.setName(requestUser.getName());
+            expensesList.setSecondName(requestUser.getSecondName());
+            expensesList.setSurname(requestUser.getSurname());
+            expensesList.setSecondSurname(requestUser.getSecondSurname());
+            expensesList.setEmail(requestUser.getEmail());
+            return expensesList;
+        }).collect(Collectors.toList());
+    }
 
 }

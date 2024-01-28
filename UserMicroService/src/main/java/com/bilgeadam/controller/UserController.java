@@ -5,6 +5,7 @@ import com.bilgeadam.dto.response.*;
 import com.bilgeadam.repository.entity.UserProfile;
 import com.bilgeadam.service.UserService;
 import io.swagger.v3.oas.annotations.Hidden;
+import jakarta.annotation.PreDestroy;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.query.Update;
@@ -112,5 +113,26 @@ public class UserController {
     public ResponseEntity<List<PermissionListResponseDtoForResponseUser>> findAllPermissionsForResponseUser(String token){
         return ResponseEntity.ok(userService.findAllPermissionsForResponseUser(token));
     }
+
+    @PostMapping(value = "/createExpense", consumes = "multipart/form-data")
+    public ResponseEntity<Boolean> createExpense(@RequestParam("file") MultipartFile file, @RequestBody CreateExpenseRequestDto dto) throws IOException {
+        return ResponseEntity.ok(userService.createExpense(file, dto));
+    }
+
+    @PutMapping("/updateExpenseState")
+    public ResponseEntity<Boolean> updateExpenseState(@RequestBody UpdateStateRequestDto dto){
+        return ResponseEntity.ok(userService.updateExpenseState(dto));
+    }
+
+    @GetMapping("/findAllExpensesForRequestUser")
+    public ResponseEntity<List<ExpensesListResponseDtoForRequestUser>> findAllExpensesForRequestUser(String token){
+        return ResponseEntity.ok(userService.findAllExpensesForRequestUser(token));
+    }
+
+    @GetMapping("/findAllExpensesForResponseUser")
+    public ResponseEntity<List<ExpensesListResponseDtoForResponseUser>> findAllExpensesForResponseUser(String token){
+        return ResponseEntity.ok(userService.findAllExpensesForResponseUser(token));
+    }
+
 
 }

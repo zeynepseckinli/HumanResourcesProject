@@ -1,24 +1,19 @@
-package com.bilgeadam.repository.entity;
+package com.bilgeadam.dto.response;
 
+import com.bilgeadam.utility.enums.EState;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
 
-@SuperBuilder
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Document
-public class Expense extends BaseEntity{
-    @Id
-    private String id;
-    private String requestUserId; //employee
-    private String responseUserId; //manager
+public class ExpensesListResponseDtoForRequestUser {
+    private String responseUserId;
     private LocalDate requestDate;
     private LocalDate responseDate;
     private String description;
@@ -26,4 +21,6 @@ public class Expense extends BaseEntity{
     private String expenseType;
     private String unitOfCurrency;
     private String url;
+    private EState state;
+
 }
