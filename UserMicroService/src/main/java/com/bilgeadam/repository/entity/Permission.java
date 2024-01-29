@@ -22,13 +22,9 @@ public class Permission extends BaseEntity {
     private String requestUserId; //employee
     private String responseUserId; //manager
     private String permissionType;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate requestDate;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate responseDate;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate permissionStart;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate permissionEnd;
     private int permissionDuration;
 

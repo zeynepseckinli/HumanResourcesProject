@@ -114,9 +114,9 @@ public class UserController {
         return ResponseEntity.ok(userService.findAllPermissionsForResponseUser(token));
     }
 
-    @PostMapping(value = "/createExpense", consumes = "multipart/form-data")
-    public ResponseEntity<Boolean> createExpense(@RequestParam("file") MultipartFile file, @RequestBody CreateExpenseRequestDto dto) throws IOException {
-        return ResponseEntity.ok(userService.createExpense(file, dto));
+    @PostMapping(value = "/create-expense")
+    public ResponseEntity<Boolean> createExpense(@RequestBody CreateExpenseRequestDto dto){
+        return ResponseEntity.ok(userService.createExpense(dto));
     }
 
     @PutMapping("/updateExpenseState")

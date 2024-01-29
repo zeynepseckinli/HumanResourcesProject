@@ -295,7 +295,7 @@ public class UserService {
         }).collect(Collectors.toList());
     }
 
-    public Boolean createExpense(MultipartFile file, CreateExpenseRequestDto dto) {
+    public Boolean createExpense(CreateExpenseRequestDto dto) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
@@ -304,11 +304,11 @@ public class UserService {
         if (user.isEmpty()) {
             throw new UserException(ErrorType.USER_NOT_FOUND);
         }
-        String url = imageUpload(file);
+       // String url = imageUpload(file);
         Expense expense = ExpenseMapper.INSTANCE.fromDto(dto);
         expense.setRequestUserId(user.get().getId());
         expense.setState(EState.PENDING);
-        expense.setUrl(url);
+       // expense.setUrl(url);
         expenseRepository.save(expense);
         return true;
     }
