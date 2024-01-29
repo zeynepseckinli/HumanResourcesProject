@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import static com.bilgeadam.constants.RestApiUrls.*;
@@ -22,6 +23,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/getMessage")
+    @PreAuthorize("hasAuthorize('MANAGER')")
     public String getMessage() {
         return "This is User Service";
     }
@@ -32,6 +34,9 @@ public class UserController {
 //        UserProfile userProfile = userService.saveUser(dto);
 //        return ResponseEntity.ok().build();
 //    }
+
+
+    //Yetki tanımlayabilmek için end-pointlerin üzerine @PreAuthorize("hasAuthority('MANAGER')")
     @PostMapping("/createUser")
     @CrossOrigin("*")
     public ResponseEntity<Boolean> createUser(@RequestBody @Valid CreateUserRequestDto dto){
