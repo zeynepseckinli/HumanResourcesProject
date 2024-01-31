@@ -23,6 +23,10 @@ spring:
       name: grupsurup
       password: 123456
 
+#jwt:
+#  secretkey: ${SocialMediaSecretKey}
+#  issuer: ${SocialMediaIssuer}
+#  audience: ${SocialMediaAudienceSecretKey}
 
 my-application:
   secret-key: "bAjAfl&ato9ruwrichlyUc1Lfaprafr8soNoCr!BramaTR7mojicr1wRI0*oC3is"

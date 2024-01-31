@@ -24,6 +24,7 @@ public class AuthService {
     private final JwtTokenManager jwtTokenManager;
     private final UserManager userManager;
 
+
     public LoginResponseDto login(LoginRequestDto dto) {
         Optional<Auth> authOptional = authRepository.findOptionalByEmailAndPassword(dto.getEmail(), dto.getPassword());
         if (authOptional.isEmpty()) {
@@ -141,7 +142,9 @@ public class AuthService {
     }
 
 
-    public Optional<Auth> findById(Long id) {
-        return authRepository.findById(id);
+    public Optional<Auth> findByAuthId(Long authId) {
+        return authRepository.findOptionalById(authId);
     }
+
+
 }

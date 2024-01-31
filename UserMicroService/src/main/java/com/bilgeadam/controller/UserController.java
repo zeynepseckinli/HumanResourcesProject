@@ -1,7 +1,9 @@
 package com.bilgeadam.controller;
 
 import com.bilgeadam.dto.request.*;
+import com.bilgeadam.dto.response.CreateCompanyResponseDto;
 import com.bilgeadam.dto.response.UserResponseDto;
+import com.bilgeadam.repository.entity.Company;
 import com.bilgeadam.repository.entity.UserProfile;
 import com.bilgeadam.service.UserService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -9,8 +11,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.bilgeadam.constants.RestApiUrls.*;
 
@@ -23,7 +27,6 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/getMessage")
-    @PreAuthorize("hasAuthorize('MANAGER')")
     public String getMessage() {
         return "This is User Service";
     }
@@ -87,5 +90,11 @@ public class UserController {
     public ResponseEntity<Boolean> updatePermissionState(@RequestBody UpdateStateRequestDto dto){
         return ResponseEntity.ok(userService.updatePermissionState(dto));
     }
+
+    @PostMapping("/createCompany")
+    public ResponseEntity<Boolean> createCompany(@RequestBody @Valid CreateCompanyResponseDto dto) {
+        return ResponseEntity.ok(userService.createCompany(dto));
+    }
+
 
 }

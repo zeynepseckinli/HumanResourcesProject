@@ -10,5 +10,5 @@ dependencies {
     implementation libs.springCloudOpenFeign
     implementation libs.springCloudConfigClient
     implementation libs.springBootAmqp
-    implementation libs.springBootSecurity
+   // implementation libs.springBootSecurity
 }

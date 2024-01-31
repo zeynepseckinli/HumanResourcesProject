@@ -16,20 +16,20 @@ import lombok.experimental.SuperBuilder;
 @Data
 @Entity
 @Table(name = "tbl_auth")
-public class Auth extends BaseEntity{
+public class Auth extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false,length = 128)
+    @Column(nullable = false, length = 128)
     private String password;
 
     @Email
     private String email;
 
-    @Enumerated(EnumType.STRING)
     @Builder.Default
-    private ERole role=ERole.EMPLOYEE;
+    @Enumerated(EnumType.STRING)
+    private ERole role = ERole.EMPLOYEE;
 
 }

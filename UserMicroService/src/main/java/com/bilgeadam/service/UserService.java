@@ -1,18 +1,22 @@
 package com.bilgeadam.service;
 
 import com.bilgeadam.dto.request.*;
+import com.bilgeadam.dto.response.CreateCompanyResponseDto;
 import com.bilgeadam.dto.response.SaveAuthResponseDto;
 import com.bilgeadam.dto.response.UserResponseDto;
 import com.bilgeadam.exception.ErrorType;
 import com.bilgeadam.exception.UserException;
 import com.bilgeadam.manager.AuthManager;
 import com.bilgeadam.mapper.AdvanceMapper;
+import com.bilgeadam.mapper.CompanyMapper;
 import com.bilgeadam.mapper.PermissionMapper;
 import com.bilgeadam.mapper.UserMapper;
 import com.bilgeadam.repository.AdvanceRepository;
+import com.bilgeadam.repository.CompanyRepository;
 import com.bilgeadam.repository.PermissionRepository;
 import com.bilgeadam.repository.UserRepository;
 import com.bilgeadam.repository.entity.Advance;
+import com.bilgeadam.repository.entity.Company;
 import com.bilgeadam.repository.entity.Permission;
 import com.bilgeadam.repository.entity.UserProfile;
 import com.bilgeadam.utility.JwtTokenManager;
@@ -22,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -34,6 +39,10 @@ public class UserService {
     private final AuthManager authManager;
     private final JwtTokenManager jwtTokenManager;
     private final PermissionRepository permissionRepository;
+    private final CompanyRepository companyRepository;
+
+
+
 
 //    public UserProfile saveUser(UserSaveRequestDto dto) {
 //        return userRepository.save(UserProfile.builder()
@@ -186,4 +195,16 @@ public class UserService {
     public Optional<UserProfile> findByAuthId(Long authId) {
         return userRepository.findOptionalByAuthId(authId);
     }
+
+    public Boolean createCompany(CreateCompanyResponseDto dto) {
+        Company company = CompanyMapper.INSTANCE.toCompany(dto);
+        Optional<Company> company2 = companyRepository.findOptionalByCompanyName(dto.getCompanyName());
+        if (company2.isPresent()) {
+            throw new UserException(ErrorType.COMPANY_ALREADY_EXIST);
+        }
+        companyRepository.save(company);
+        return true;
+    }
+
+
 }

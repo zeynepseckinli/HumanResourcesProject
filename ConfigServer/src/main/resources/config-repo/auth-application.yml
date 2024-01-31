@@ -20,6 +20,10 @@ spring:
     user:
       name: grupsurup
       password: 123456
+#jwt:
+#  secretkey: ${SocialMediaSecretKey}
+#  issuer: ${SocialMediaIssuer}
+#  audience: ${SocialMediaAudienceSecretKey}
 
 my-application:
   user-end-point: http://localhost:9092/user

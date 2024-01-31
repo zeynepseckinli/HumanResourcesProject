@@ -23,9 +23,10 @@ public class JwtTokenManager {
      * Sign -> jwt nin imzalanması yani bir şifreleme algoritması ile şifrelenmesi.
      */
     @Value("${my-application.secret-key}")
-    private  String SECRETKEY;
+    private String SECRETKEY;
     private final String ISSUER = "Java11BoostAuth";
-    private final Long EXDATE = 1000L*60*5; // 5 Dakika
+    private final Long EXDATE = 1000L * 60 * 5; // 5 Dakika
+
     /**
      * Kullanıcının authId si alınarak yeni bir jwt token üretilir.
      *
@@ -51,12 +52,11 @@ public class JwtTokenManager {
     }
 
     /**
-     *
      * @param token
      * @return
      */
-    public boolean validateToken(String token){
-        try{
+    public boolean validateToken(String token) {
+        try {
             /**
              * Şifrelediğimiz token için şifreyi çözme ve doğrulama işlemi için
              * alogitmayı tanımlıyoruz.
@@ -67,7 +67,7 @@ public class JwtTokenManager {
              * sahipliğini giriyoruz.
              */
             JWTVerifier verifier = JWT.require(algorithm)
-                                      .withIssuer(ISSUER).build();
+                    .withIssuer(ISSUER).build();
             /**
              * verifier ile token' ı çözüyoruz.
              */
@@ -78,31 +78,32 @@ public class JwtTokenManager {
              * 2-> token süresi dolmuş olabilir.
              * 3-> farklı bir sahiplik gönderilmiş olabilir.
              */
-            if(decodedJWT==null)
+            if (decodedJWT == null)
                 return false;
-        }catch (Exception exception){
+        } catch (Exception exception) {
             return false;
         }
-        return  true;
+        return true;
     }
 
     /**
      * token verip kime ait olduğunu dönuyoruz.
+     *
      * @param token
      * @return
      */
-    public Optional<Long> getIdByToken(String token){
-        try{
+    public Optional<Long> getIdByToken(String token) {
+        try {
             Algorithm algorithm = Algorithm.HMAC512(SECRETKEY);
             JWTVerifier verifier = JWT.require(algorithm)
                     .withIssuer(ISSUER).build();
             DecodedJWT decodedJWT = verifier.verify(token);
-            if(decodedJWT == null)
+            if (decodedJWT == null)
                 return Optional.empty();
             Long authId = decodedJWT.getClaim("authId").asLong();
             return Optional.of(authId);
-        }catch (Exception exception){
-            return  Optional.empty();
+        } catch (Exception exception) {
+            return Optional.empty();
         }
     }
 }
