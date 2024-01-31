@@ -24,6 +24,7 @@ ext {
             springBootAmqp             : "org.springframework.boot:spring-boot-starter-amqp:$versions.springBoot",
 
             springCloudOpenFeign       : "org.springframework.cloud:spring-cloud-starter-openfeign:$versions.springCloud",
+            springBootMailSender       : "org.springframework.boot:spring-boot-starter-mail:$versions.springBoot",
 
             springCloudConfig          : "org.springframework.cloud:spring-cloud-starter-config:$versions.springCloud",
             springCloudConfigServer    : "org.springframework.cloud:spring-cloud-config-server:$versions.springCloud",

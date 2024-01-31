@@ -10,6 +10,9 @@ import com.bilgeadam.mapper.AdvanceMapper;
 import com.bilgeadam.mapper.ExpenseMapper;
 import com.bilgeadam.mapper.PermissionMapper;
 import com.bilgeadam.mapper.UserMapper;
+import com.bilgeadam.rabbitmq.model.RegisterModel;
+import com.bilgeadam.rabbitmq.producer.RegisterMailProducer;
+import com.bilgeadam.rabbitmq.producer.RegisterProducer;
 import com.bilgeadam.repository.AdvanceRepository;
 import com.bilgeadam.repository.ExpenseRepository;
 import com.bilgeadam.repository.PermissionRepository;
@@ -23,8 +26,13 @@ import com.bilgeadam.utility.enums.EState;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -42,6 +50,10 @@ public class UserService {
     private final PermissionRepository permissionRepository;
     private final CloudinaryConfig cloudinaryConfig;
     private final ExpenseRepository expenseRepository;
+    private final RegisterMailProducer registerMailProducer;
+
+
+
 
 //    public UserProfile saveUser(UserSaveRequestDto dto) {
 //        return userRepository.save(UserProfile.builder()
@@ -50,20 +62,25 @@ public class UserService {
 //                .build());
 //    }
 
+    @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
     public Boolean createUser(CreateUserRequestDto dto){
         userRepository.findOptionalByEmail(dto.getEmail())
                 .ifPresent(userProfile -> {
                     throw new UserException(ErrorType.USERNAME_DUPLICATE);
                 });
         //auth save
+        String randomPass = generateRandomPassword(8);
         ResponseEntity<SaveAuthResponseDto> authDto = authManager.save(SaveAuthRequestDto.builder()
                         .email(dto.getEmail())
-                        .password(generateRandomPassword(8))
+                        .password(randomPass)
                 .build());
+
         SaveAuthResponseDto saveAuthResponseDto = authDto.getBody();
         UserProfile user = UserMapper.INSTANCE.fromCreateUserRequestDto(dto);
         user.setAuthId(saveAuthResponseDto.getAuthId());
+        user.setActivationCode(randomPass);
         userRepository.save(user);
+        registerMailProducer.sendActivationCode(UserMapper.INSTANCE.fromUserToRegisterModel(user));
         return true;
     }
 

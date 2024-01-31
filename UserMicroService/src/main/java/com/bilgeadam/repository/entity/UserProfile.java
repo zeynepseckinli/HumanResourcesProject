@@ -27,6 +27,7 @@ public class UserProfile extends BaseEntity {
     private String surname;
     private String secondSurname;
     private String email;
+    private String activationCode;
     private String personalEmail;
     private String identityNumber;
     private String birthPlace;
