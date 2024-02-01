@@ -11,6 +11,7 @@ import com.bilgeadam.mapper.AdvanceMapper;
 import com.bilgeadam.mapper.CompanyMapper;
 import com.bilgeadam.mapper.PermissionMapper;
 import com.bilgeadam.mapper.UserMapper;
+import com.bilgeadam.rabbitmq.producer.RegisterMailProducer;
 import com.bilgeadam.repository.AdvanceRepository;
 import com.bilgeadam.repository.CompanyRepository;
 import com.bilgeadam.repository.PermissionRepository;

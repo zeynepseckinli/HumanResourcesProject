@@ -9,5 +9,8 @@ import java.util.Optional;
 @Repository
 public interface CompanyRepository extends MongoRepository<Company, String> {
 
-    Optional<Company> findOptionalByCompanyName(String companyName);
+    Optional<Company> findOptionalByCompany(String company);
+
+
+
 }
