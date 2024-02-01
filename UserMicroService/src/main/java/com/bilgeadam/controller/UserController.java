@@ -1,18 +1,21 @@
 package com.bilgeadam.controller;
 
 import com.bilgeadam.dto.request.*;
-import com.bilgeadam.dto.response.CreateCompanyResponseDto;
-import com.bilgeadam.dto.response.UserResponseDto;
-import com.bilgeadam.repository.entity.Company;
+import com.bilgeadam.dto.response.*;
 import com.bilgeadam.repository.entity.UserProfile;
 import com.bilgeadam.service.UserService;
 import io.swagger.v3.oas.annotations.Hidden;
+import jakarta.annotation.PreDestroy;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
 
 import java.util.List;
 
@@ -70,6 +73,12 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUserRole(dto));
     }
 
+    @PostMapping(value = "/updateUserImage", consumes = "multipart/form-data")
+    public ResponseEntity<String> updateUserImage(@RequestParam("file") MultipartFile file, @RequestParam("token") String token) throws IOException {
+        return ResponseEntity.ok(userService.updateUserImage(file, token));
+    }
+
+
     @PostMapping("/createAdvance")
     public ResponseEntity<Boolean> createAdvance(@RequestBody @Valid CreateAdvanceRequestDto dto) {
         return ResponseEntity.ok(userService.createAdvance(dto));
@@ -80,20 +89,55 @@ public class UserController {
         return ResponseEntity.ok(userService.updateAdvanceState(dto));
     }
 
+    @GetMapping("/findAllAdvancesForRequestUser")
+    public ResponseEntity<List<AdvanceListResponseDtoForRequestUser>> findAllAdvancesForRequestUser(String token){
+        return ResponseEntity.ok(userService.findAllAdvancesForRequestUser(token));
+    }
+
+    @GetMapping("/findAllAdvancesForResponseUser")
+    public ResponseEntity<List<AdvanceListResponseDtoForResponseUser>> findAllAdvancesForResponseUser(String token){
+        return ResponseEntity.ok(userService.findAllAdvancesForResponseUser(token));
+    }
+
 
     @PostMapping("/createPermission")
     public ResponseEntity<Boolean> createPermission(@RequestBody @Valid CreatePermissionRequestDto dto) {
         return ResponseEntity.ok(userService.createPermission(dto));
     }
 
-    @PostMapping("/updatePermissionState")
+    @PutMapping("/updatePermissionState")
     public ResponseEntity<Boolean> updatePermissionState(@RequestBody UpdateStateRequestDto dto){
         return ResponseEntity.ok(userService.updatePermissionState(dto));
     }
 
-    @PostMapping("/createCompany")
-    public ResponseEntity<Boolean> createCompany(@RequestBody @Valid CreateCompanyResponseDto dto) {
-        return ResponseEntity.ok(userService.createCompany(dto));
+    @GetMapping("/findAllPermissionsForRequestUser")
+    public ResponseEntity<List<PermissionListResponseDtoForRequestUser>> findAllPermissionsForRequestUser(String token){
+        return ResponseEntity.ok(userService.findAllPermissionsForRequestUser(token));
+    }
+
+    @GetMapping("/findAllPermissionsForResponseUser")
+    public ResponseEntity<List<PermissionListResponseDtoForResponseUser>> findAllPermissionsForResponseUser(String token){
+        return ResponseEntity.ok(userService.findAllPermissionsForResponseUser(token));
+    }
+
+    @PostMapping(value = "/create-expense")
+    public ResponseEntity<Boolean> createExpense(@RequestBody CreateExpenseRequestDto dto){
+        return ResponseEntity.ok(userService.createExpense(dto));
+    }
+
+    @PutMapping("/updateExpenseState")
+    public ResponseEntity<Boolean> updateExpenseState(@RequestBody UpdateStateRequestDto dto){
+        return ResponseEntity.ok(userService.updateExpenseState(dto));
+    }
+
+    @GetMapping("/findAllExpensesForRequestUser")
+    public ResponseEntity<List<ExpensesListResponseDtoForRequestUser>> findAllExpensesForRequestUser(String token){
+        return ResponseEntity.ok(userService.findAllExpensesForRequestUser(token));
+    }
+
+    @GetMapping("/findAllExpensesForResponseUser")
+    public ResponseEntity<List<ExpensesListResponseDtoForResponseUser>> findAllExpensesForResponseUser(String token){
+        return ResponseEntity.ok(userService.findAllExpensesForResponseUser(token));
     }
 
 

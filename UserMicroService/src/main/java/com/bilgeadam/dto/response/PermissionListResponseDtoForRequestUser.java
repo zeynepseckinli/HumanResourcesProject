@@ -1,4 +1,4 @@
-package com.bilgeadam.dto.request;
+package com.bilgeadam.dto.response;
 
 import com.bilgeadam.utility.enums.EState;
 import lombok.AllArgsConstructor;
@@ -13,18 +13,17 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CreatePermissionRequestDto {
-
-    private String token;
+public class PermissionListResponseDtoForRequestUser {
     private String responseUserId;
     private String permissionType;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate dateOfRequest;
+    private LocalDate permissionStart;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate startOfPermission;
+    private LocalDate permissionEnd;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate endOfPermission;
+    private LocalDate requestDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate responseDate;
     private int permissionDuration;
-
+    private EState state;
 }
-
