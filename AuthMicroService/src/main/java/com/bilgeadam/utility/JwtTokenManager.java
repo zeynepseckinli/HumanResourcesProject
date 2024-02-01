@@ -25,7 +25,11 @@ public class JwtTokenManager {
     @Value("${my-application.secret-key}")
     private String SECRETKEY;
     private final String ISSUER = "Java11BoostAuth";
-    private final Long EXDATE = 1000L * 60 * 5; // 5 Dakika
+    private final Long EXDATE = 1000L*60*45; // 45 Dakika
+
+
+
+
 
     /**
      * Kullanıcının authId si alınarak yeni bir jwt token üretilir.

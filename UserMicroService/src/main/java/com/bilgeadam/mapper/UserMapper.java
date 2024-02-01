@@ -5,6 +5,7 @@ import com.bilgeadam.dto.request.CreateUserRequestDto;
 import com.bilgeadam.dto.request.UserSaveRequestDto;
 import com.bilgeadam.dto.request.UserUpdateRequestDto;
 import com.bilgeadam.dto.response.UserResponseDto;
+import com.bilgeadam.rabbitmq.model.RegisterMailModel;
 import com.bilgeadam.repository.entity.UserProfile;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
@@ -22,5 +23,6 @@ public interface UserMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     UserProfile fromUpdateDtoToUserProfile(UserUpdateRequestDto dto, @MappingTarget UserProfile user);
 
+    RegisterMailModel fromUserToRegisterModel(final UserProfile user);
 }
 

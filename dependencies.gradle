@@ -8,7 +8,8 @@ ext {
             mapstruct           : "1.5.5.Final",
             swaggerui           : "2.1.0",
             postgresql          : "42.6.0",
-            jwt                 : "4.4.0"
+            jwt                 : "4.4.0",
+            cloudinary          : "1.34.0"
     ]
 
     libs = [
@@ -23,6 +24,7 @@ ext {
             springBootAmqp             : "org.springframework.boot:spring-boot-starter-amqp:$versions.springBoot",
 
             springCloudOpenFeign       : "org.springframework.cloud:spring-cloud-starter-openfeign:$versions.springCloud",
+            springBootMailSender       : "org.springframework.boot:spring-boot-starter-mail:$versions.springBoot",
 
             springCloudConfig          : "org.springframework.cloud:spring-cloud-starter-config:$versions.springCloud",
             springCloudConfigServer    : "org.springframework.cloud:spring-cloud-config-server:$versions.springCloud",
@@ -42,7 +44,9 @@ ext {
 
             postgresql                 : "org.postgresql:postgresql:$versions.postgresql",
 
-            jwt                        : "com.auth0:java-jwt:$versions.jwt"
+            jwt                        : "com.auth0:java-jwt:$versions.jwt",
+
+            springCloudinary            : "com.cloudinary:cloudinary-http44:$versions.cloudinary"
 
 
 

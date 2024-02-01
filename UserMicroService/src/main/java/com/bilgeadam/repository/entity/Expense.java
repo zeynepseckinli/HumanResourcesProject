@@ -14,17 +14,16 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Data
 @Document
-public class Advance extends BaseEntity {
-
+public class Expense extends BaseEntity{
     @Id
     private String id;
-    private String requestUserId;//employee id
-    private String responseUserId;// manager id
-    private Long advanceAmount;
-    private String unitOfCurrency;
-    private String description;
-    private String advanceType;
+    private String requestUserId; //employee
+    private String responseUserId; //manager
     private LocalDate requestDate;
     private LocalDate responseDate;
-
+    private String description;
+    private Double expenseAmount;
+    private String expenseType;
+    private String unitOfCurrency;
+    private String url;
 }

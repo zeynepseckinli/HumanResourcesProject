@@ -142,9 +142,6 @@ public class AuthService {
     }
 
 
-    public Optional<Auth> findByAuthId(Long authId) {
-        return authRepository.findOptionalById(authId);
-    }
 
 
 }

@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 public class UpdateStateRequestDto {
 
     String id;
-    EState approvalState;
+    EState selectedState;
 
 }
