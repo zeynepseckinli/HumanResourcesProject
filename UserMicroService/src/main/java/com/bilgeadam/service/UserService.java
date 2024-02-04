@@ -6,30 +6,17 @@ import com.bilgeadam.dto.response.*;
 import com.bilgeadam.exception.ErrorType;
 import com.bilgeadam.exception.UserException;
 import com.bilgeadam.manager.AuthManager;
-import com.bilgeadam.mapper.AdvanceMapper;
-import com.bilgeadam.mapper.ExpenseMapper;
-import com.bilgeadam.mapper.PermissionMapper;
-import com.bilgeadam.mapper.UserMapper;
-import com.bilgeadam.rabbitmq.model.RegisterModel;
+import com.bilgeadam.mapper.*;
 import com.bilgeadam.rabbitmq.producer.RegisterMailProducer;
-import com.bilgeadam.rabbitmq.producer.RegisterProducer;
-import com.bilgeadam.repository.AdvanceRepository;
-import com.bilgeadam.repository.ExpenseRepository;
-import com.bilgeadam.repository.PermissionRepository;
-import com.bilgeadam.repository.UserRepository;
-import com.bilgeadam.repository.entity.Advance;
-import com.bilgeadam.repository.entity.Expense;
-import com.bilgeadam.repository.entity.Permission;
-import com.bilgeadam.repository.entity.UserProfile;
+import com.bilgeadam.repository.*;
+import com.bilgeadam.repository.entity.*;
 import com.bilgeadam.utility.JwtTokenManager;
+import com.bilgeadam.utility.enums.ERole;
 import com.bilgeadam.utility.enums.EState;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,8 +29,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
 
+    private final UserRepository userRepository;
     private final AdvanceRepository advanceRepository;
     private final AuthManager authManager;
     private final JwtTokenManager jwtTokenManager;
@@ -51,8 +38,7 @@ public class UserService {
     private final CloudinaryConfig cloudinaryConfig;
     private final ExpenseRepository expenseRepository;
     private final RegisterMailProducer registerMailProducer;
-
-
+    private final CompanyRepository companyRepository;
 
 
 //    public UserProfile saveUser(UserSaveRequestDto dto) {
@@ -63,7 +49,7 @@ public class UserService {
 //    }
 
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-    public Boolean createUser(CreateUserRequestDto dto){
+    public Boolean createUser(CreateUserRequestDto dto) {
         userRepository.findOptionalByEmail(dto.getEmail())
                 .ifPresent(userProfile -> {
                     throw new UserException(ErrorType.USERNAME_DUPLICATE);
@@ -71,8 +57,8 @@ public class UserService {
         //auth save
         String randomPass = generateRandomPassword(8);
         ResponseEntity<SaveAuthResponseDto> authDto = authManager.save(SaveAuthRequestDto.builder()
-                        .email(dto.getEmail())
-                        .password(randomPass)
+                .email(dto.getEmail())
+                .password(randomPass)
                 .build());
 
         SaveAuthResponseDto saveAuthResponseDto = authDto.getBody();
@@ -116,17 +102,17 @@ public class UserService {
         if (user.isPresent()) {
             userRepository.save(UserMapper.INSTANCE.fromUpdateDtoToUserProfile(dto, user.get()));
             authManager.updateAuth(AuthUpdateRequestDto.builder()
-                            .authId(authId.get())
-                            .email(dto.getEmail())
+                    .authId(authId.get())
+                    .email(dto.getEmail())
                     .build());
             return true;
         }
         throw new UserException(ErrorType.USER_NOT_FOUND);
     }
 
-    public Boolean updateUserState(AuthStateUpdateRequestDto dto){
+    public Boolean updateUserState(AuthStateUpdateRequestDto dto) {
         Optional<UserProfile> user = userRepository.findOptionalByAuthId(dto.getAuthId());
-        if (user.isEmpty()){
+        if (user.isEmpty()) {
             throw new UserException(ErrorType.REQUEST_NOT_FOUND);
         }
         user.get().setState(dto.getSelectedState());
@@ -135,9 +121,9 @@ public class UserService {
         return true;
     }
 
-    public Boolean updateUserRole(AuthRoleUpdateRequestDto dto){
+    public Boolean updateUserRole(AuthRoleUpdateRequestDto dto) {
         Optional<UserProfile> user = userRepository.findOptionalByAuthId(dto.getAuthId());
-        if (user.isEmpty()){
+        if (user.isEmpty()) {
             throw new UserException(ErrorType.REQUEST_NOT_FOUND);
         }
         user.get().setRole(dto.getSelectedRole());
@@ -148,7 +134,7 @@ public class UserService {
     }
 
 
-    public String updateUserImage(MultipartFile file, String token){
+    public String updateUserImage(MultipartFile file, String token) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
@@ -164,7 +150,7 @@ public class UserService {
     }
 
 
-    public String imageUpload(MultipartFile file){
+    public String imageUpload(MultipartFile file) {
         Map<String, String> config = new HashMap<>();
         config.put("cloud_name", cloudinaryConfig.getCloud_name());
         config.put("api_key", cloudinaryConfig.getApi_key());
@@ -173,10 +159,10 @@ public class UserService {
         Cloudinary cloudinary = new Cloudinary(config);
 
         try {
-            Map<?,?> result = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            Map<?, ?> result = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
             String url = (String) result.get("url");
             return url;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -193,7 +179,7 @@ public class UserService {
             throw new UserException(ErrorType.USER_NOT_FOUND);
         }
         if (dto.getAdvanceAmount() > user.get().getSalary() * 3) {
-                throw new UserException(ErrorType.ADVANCE_ERROR);
+            throw new UserException(ErrorType.ADVANCE_ERROR);
         }
         Advance advance = AdvanceMapper.INSTANCE.fromDto(dto);
         advance.setRequestUserId(user.get().getId());
@@ -204,7 +190,7 @@ public class UserService {
 
     public Boolean updateAdvanceState(UpdateStateRequestDto dto) {
         Optional<Advance> advance = advanceRepository.findById(dto.getId());
-        if(advance.isEmpty()) {
+        if (advance.isEmpty()) {
             throw new UserException(ErrorType.REQUEST_NOT_FOUND);
         }
         advance.get().setState(dto.getSelectedState());
@@ -213,7 +199,7 @@ public class UserService {
         return true;
     }
 
-    public List<AdvanceListResponseDtoForRequestUser> findAllAdvancesForRequestUser (String token) {
+    public List<AdvanceListResponseDtoForRequestUser> findAllAdvancesForRequestUser(String token) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
@@ -227,7 +213,7 @@ public class UserService {
         }).collect(Collectors.toList());
     }
 
-    public List<AdvanceListResponseDtoForResponseUser> findAllAdvancesForResponseUser (String token) {
+    public List<AdvanceListResponseDtoForResponseUser> findAllAdvancesForResponseUser(String token) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
@@ -268,7 +254,7 @@ public class UserService {
 
     public Boolean updatePermissionState(UpdateStateRequestDto dto) {
         Optional<Permission> permission = permissionRepository.findById(dto.getId());
-        if(permission.isEmpty()) {
+        if (permission.isEmpty()) {
             throw new UserException(ErrorType.REQUEST_NOT_FOUND);
         }
         permission.get().setState(dto.getSelectedState());
@@ -277,7 +263,7 @@ public class UserService {
         return true;
     }
 
-    public List<PermissionListResponseDtoForRequestUser> findAllPermissionsForRequestUser (String token) {
+    public List<PermissionListResponseDtoForRequestUser> findAllPermissionsForRequestUser(String token) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
@@ -291,7 +277,7 @@ public class UserService {
         }).collect(Collectors.toList());
     }
 
-    public List<PermissionListResponseDtoForResponseUser> findAllPermissionsForResponseUser (String token) {
+    public List<PermissionListResponseDtoForResponseUser> findAllPermissionsForResponseUser(String token) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
@@ -321,18 +307,18 @@ public class UserService {
         if (user.isEmpty()) {
             throw new UserException(ErrorType.USER_NOT_FOUND);
         }
-       // String url = imageUpload(file);
+        // String url = imageUpload(file);
         Expense expense = ExpenseMapper.INSTANCE.fromDto(dto);
         expense.setRequestUserId(user.get().getId());
         expense.setState(EState.PENDING);
-       // expense.setUrl(url);
+        // expense.setUrl(url);
         expenseRepository.save(expense);
         return true;
     }
 
     public Boolean updateExpenseState(UpdateStateRequestDto dto) {
         Optional<Expense> expense = expenseRepository.findById(dto.getId());
-        if(expense.isEmpty()) {
+        if (expense.isEmpty()) {
             throw new UserException(ErrorType.REQUEST_NOT_FOUND);
         }
         expense.get().setState(dto.getSelectedState());
@@ -341,7 +327,7 @@ public class UserService {
         return true;
     }
 
-    public List<ExpensesListResponseDtoForRequestUser> findAllExpensesForRequestUser (String token) {
+    public List<ExpensesListResponseDtoForRequestUser> findAllExpensesForRequestUser(String token) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
@@ -355,7 +341,7 @@ public class UserService {
         }).collect(Collectors.toList());
     }
 
-    public List<ExpensesListResponseDtoForResponseUser> findAllExpensesForResponseUser (String token) {
+    public List<ExpensesListResponseDtoForResponseUser> findAllExpensesForResponseUser(String token) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
@@ -375,5 +361,75 @@ public class UserService {
             return expensesList;
         }).collect(Collectors.toList());
     }
+
+
+    public Boolean createCompany(CreateCompanyRequestDto dto) {
+        Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+        if (user.isPresent() && user.get().getRole().equals(ERole.ADMIN)) {
+            Company company = CompanyMapper.INSTANCE.toCompany(dto);
+            companyRepository.save(company);
+        } else {
+            throw new UserException(ErrorType.NOT_AUTHORIZED);
+        }
+        return true;
+
+    }
+
+
+    public Boolean updateCompany(UpdateCompanyRequestDto dto) {
+        Optional<Company> company = companyRepository.findById(dto.getId());
+        if (company.isEmpty()) {
+            throw new UserException(ErrorType.COMPANY_NOT_FOUND);
+        }
+        Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+        if (user.isPresent() && user.get().getRole().equals(ERole.ADMIN)) {
+            company.get().setName(dto.getName());
+            company.get().setTitle(dto.getTitle());
+            company.get().setTaxNumber(dto.getTaxNumber());
+            company.get().setAddress(dto.getAddress());
+            company.get().setPhone(dto.getPhone());
+            company.get().setEmail(dto.getEmail());
+            company.get().setNumberOfEmployees(dto.getNumberOfEmployees());
+            company.get().setYearOfEstablishment(dto.getYearOfEstablishment());
+            companyRepository.save(company.get());
+        } else {
+            throw new UserException(ErrorType.NOT_AUTHORIZED);
+        }
+        return true;
+
+    }
+
+
+//    public Boolean deleteCompany(String id) {
+//        Optional<Company> company = companyRepository.findById(id);
+//        if (company.isEmpty()) {
+//            throw new UserException(ErrorType.COMPANY_NOT_FOUND);
+//        }
+//        companyRepository.delete(company.get());
+//        return true;
+//    }
+
+
+    public List<Company> findAllCompanies(String token) {
+        Optional<Long> authId = jwtTokenManager.getIdByToken(token);
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+        if (user.isPresent() && user.get().getRole().equals(ERole.ADMIN)) {
+            return companyRepository.findAll();
+        } else {
+            throw new UserException(ErrorType.NOT_AUTHORIZED);
+        }
+    }
+
 
 }

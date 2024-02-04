@@ -12,8 +12,8 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 public class CloudinaryConfig {
-    String cloud_name="doeg0atzh";
-    String api_key="721784912226891";
-    String api_secret="r0HSmvY6DR6gcfP1LaX36whbTZ0";
+    String cloud_name = "doeg0atzh";
+    String api_key = "721784912226891";
+    String api_secret = "r0HSmvY6DR6gcfP1LaX36whbTZ0";
 
 }

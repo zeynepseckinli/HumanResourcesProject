@@ -1,7 +1,7 @@
 package com.bilgeadam.mapper;
 
 
-import com.bilgeadam.dto.response.CreateCompanyResponseDto;
+import com.bilgeadam.dto.request.CreateCompanyRequestDto;
 import com.bilgeadam.repository.entity.Company;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
@@ -11,7 +11,8 @@ import org.mapstruct.factory.Mappers;
 public interface CompanyMapper {
 
     CompanyMapper INSTANCE = Mappers.getMapper(CompanyMapper.class);
-    Company toCompany(final CreateCompanyResponseDto dto);
+
+    Company toCompany(final CreateCompanyRequestDto dto);
 
 
 }

@@ -72,11 +72,5 @@ public class AuthController {
     }
 
 
-    @GetMapping("/auth-message")
-    //@PreAuthorize("hasAnyAuthority('ADMIN')")
-    public String getAuthMessage() {
-        return "Security integration";
-    }
-
 
 }

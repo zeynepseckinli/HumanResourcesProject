@@ -2,6 +2,7 @@ package com.bilgeadam.controller;
 
 import com.bilgeadam.dto.request.*;
 import com.bilgeadam.dto.response.*;
+import com.bilgeadam.repository.entity.Company;
 import com.bilgeadam.repository.entity.UserProfile;
 import com.bilgeadam.service.UserService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -45,7 +46,7 @@ public class UserController {
     //Yetki tanımlayabilmek için end-pointlerin üzerine @PreAuthorize("hasAuthority('MANAGER')")
     @PostMapping("/createUser")
     @CrossOrigin("*")
-    public ResponseEntity<Boolean> createUser(@RequestBody @Valid CreateUserRequestDto dto){
+    public ResponseEntity<Boolean> createUser(@RequestBody @Valid CreateUserRequestDto dto) {
         return ResponseEntity.ok(userService.createUser(dto));
     }
 
@@ -85,17 +86,17 @@ public class UserController {
     }
 
     @PutMapping("/updateAdvanceState")
-    public ResponseEntity<Boolean> updateAdvanceState (@RequestBody UpdateStateRequestDto dto) {
+    public ResponseEntity<Boolean> updateAdvanceState(@RequestBody UpdateStateRequestDto dto) {
         return ResponseEntity.ok(userService.updateAdvanceState(dto));
     }
 
     @GetMapping("/findAllAdvancesForRequestUser")
-    public ResponseEntity<List<AdvanceListResponseDtoForRequestUser>> findAllAdvancesForRequestUser(String token){
+    public ResponseEntity<List<AdvanceListResponseDtoForRequestUser>> findAllAdvancesForRequestUser(String token) {
         return ResponseEntity.ok(userService.findAllAdvancesForRequestUser(token));
     }
 
     @GetMapping("/findAllAdvancesForResponseUser")
-    public ResponseEntity<List<AdvanceListResponseDtoForResponseUser>> findAllAdvancesForResponseUser(String token){
+    public ResponseEntity<List<AdvanceListResponseDtoForResponseUser>> findAllAdvancesForResponseUser(String token) {
         return ResponseEntity.ok(userService.findAllAdvancesForResponseUser(token));
     }
 
@@ -106,39 +107,59 @@ public class UserController {
     }
 
     @PutMapping("/updatePermissionState")
-    public ResponseEntity<Boolean> updatePermissionState(@RequestBody UpdateStateRequestDto dto){
+    public ResponseEntity<Boolean> updatePermissionState(@RequestBody UpdateStateRequestDto dto) {
         return ResponseEntity.ok(userService.updatePermissionState(dto));
     }
 
     @GetMapping("/findAllPermissionsForRequestUser")
-    public ResponseEntity<List<PermissionListResponseDtoForRequestUser>> findAllPermissionsForRequestUser(String token){
+    public ResponseEntity<List<PermissionListResponseDtoForRequestUser>> findAllPermissionsForRequestUser(String token) {
         return ResponseEntity.ok(userService.findAllPermissionsForRequestUser(token));
     }
 
     @GetMapping("/findAllPermissionsForResponseUser")
-    public ResponseEntity<List<PermissionListResponseDtoForResponseUser>> findAllPermissionsForResponseUser(String token){
+    public ResponseEntity<List<PermissionListResponseDtoForResponseUser>> findAllPermissionsForResponseUser(String token) {
         return ResponseEntity.ok(userService.findAllPermissionsForResponseUser(token));
     }
 
     @PostMapping(value = "/create-expense")
-    public ResponseEntity<Boolean> createExpense(@RequestBody CreateExpenseRequestDto dto){
+    public ResponseEntity<Boolean> createExpense(@RequestBody CreateExpenseRequestDto dto) {
         return ResponseEntity.ok(userService.createExpense(dto));
     }
 
     @PutMapping("/updateExpenseState")
-    public ResponseEntity<Boolean> updateExpenseState(@RequestBody UpdateStateRequestDto dto){
+    public ResponseEntity<Boolean> updateExpenseState(@RequestBody UpdateStateRequestDto dto) {
         return ResponseEntity.ok(userService.updateExpenseState(dto));
     }
 
     @GetMapping("/findAllExpensesForRequestUser")
-    public ResponseEntity<List<ExpensesListResponseDtoForRequestUser>> findAllExpensesForRequestUser(String token){
+    public ResponseEntity<List<ExpensesListResponseDtoForRequestUser>> findAllExpensesForRequestUser(String token) {
         return ResponseEntity.ok(userService.findAllExpensesForRequestUser(token));
     }
 
     @GetMapping("/findAllExpensesForResponseUser")
-    public ResponseEntity<List<ExpensesListResponseDtoForResponseUser>> findAllExpensesForResponseUser(String token){
+    public ResponseEntity<List<ExpensesListResponseDtoForResponseUser>> findAllExpensesForResponseUser(String token) {
         return ResponseEntity.ok(userService.findAllExpensesForResponseUser(token));
     }
+
+    @PostMapping("/create-company")
+    public ResponseEntity<Boolean> createCompany(@RequestBody CreateCompanyRequestDto dto) {
+        return ResponseEntity.ok(userService.createCompany(dto));
+    }
+
+    @PutMapping("/update-company")
+    public ResponseEntity<Boolean> updateCompany(@RequestBody UpdateCompanyRequestDto dto) {
+        return ResponseEntity.ok(userService.updateCompany(dto));
+
+    }
+
+    @GetMapping("/find-all-company")
+    public ResponseEntity<List<Company>> findAll(String token) {
+        return ResponseEntity.ok(userService.findAllCompanies(token));
+    }
+
+
+
+
 
 
 }
