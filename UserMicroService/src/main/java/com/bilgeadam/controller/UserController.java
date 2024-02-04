@@ -145,12 +145,20 @@ public class UserController {
     }
 
     @PostMapping("/create-company")
-    public ResponseEntity<Boolean> createCompany(@RequestBody companydto dto){
-        Company company = Company.builder()
-                .name(dto.getName())
-                .build();
-        companyRepository.save(company);
-        return ResponseEntity.ok(true);
+    public ResponseEntity<Boolean> createCompany(@RequestBody CreateCompanyRequestDto dto) {
+        return ResponseEntity.ok(userService.createCompany(dto));
     }
+
+    @PutMapping("/update-company")
+    public ResponseEntity<Boolean> updateCompany(@RequestBody UpdateCompanyRequestDto dto) {
+        return ResponseEntity.ok(userService.updateCompany(dto));
+
+    }
+
+    @GetMapping("/find-all-company")
+    public ResponseEntity<List<Company>> findAll(String token) {
+        return ResponseEntity.ok(userService.findAllCompanies(token));
+    }
+
 
 }

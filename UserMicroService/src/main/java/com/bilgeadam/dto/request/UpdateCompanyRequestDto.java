@@ -1,29 +1,27 @@
-package com.bilgeadam.repository.entity;
+package com.bilgeadam.dto.request;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
 
-@SuperBuilder
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Document
-public class Company extends BaseEntity {
+public class UpdateCompanyRequestDto {
 
-    @Id
     private String id;
+    private String token;
     private String name;
-    private String taxNumber;
     private String title;
+    private String taxNumber;
     private String address;
     private String phone;
     private String email;
     private int numberOfEmployees;
     private LocalDate yearOfEstablishment;
+
 }

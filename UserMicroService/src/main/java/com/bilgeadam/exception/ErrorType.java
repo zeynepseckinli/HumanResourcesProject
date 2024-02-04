@@ -28,7 +28,8 @@ public enum ErrorType {
     PASSWORD_NOT_MATCH(4120, "Parolalar uyusmamaktadir...", HttpStatus.BAD_REQUEST),
     ADVANCE_ERROR(4121, "Avans tutarı olması gerekenden yüksek.", HttpStatus.BAD_REQUEST),
     REQUEST_NOT_FOUND(4122,"Personel isteği bulunamadı.",HttpStatus.BAD_REQUEST),
-    AUTHORITY_ERROR(4123,"Bu işlem için yetkiniz yoktur.",HttpStatus.BAD_REQUEST);
+    AUTHORITY_ERROR(4123,"Bu işlem için yetkiniz yoktur.",HttpStatus.BAD_REQUEST),
+    COMPANY_NOT_FOUND(4124, "Şirket bulunmamaktadır...",HttpStatus.BAD_REQUEST );
 
     private int code;
     private String message;

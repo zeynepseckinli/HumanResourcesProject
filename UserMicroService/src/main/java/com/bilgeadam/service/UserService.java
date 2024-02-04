@@ -6,10 +6,7 @@ import com.bilgeadam.dto.response.*;
 import com.bilgeadam.exception.ErrorType;
 import com.bilgeadam.exception.UserException;
 import com.bilgeadam.manager.AuthManager;
-import com.bilgeadam.mapper.AdvanceMapper;
-import com.bilgeadam.mapper.ExpenseMapper;
-import com.bilgeadam.mapper.PermissionMapper;
-import com.bilgeadam.mapper.UserMapper;
+import com.bilgeadam.mapper.*;
 import com.bilgeadam.rabbitmq.model.RegisterModel;
 import com.bilgeadam.rabbitmq.producer.RegisterMailProducer;
 import com.bilgeadam.rabbitmq.producer.RegisterProducer;
@@ -450,5 +447,75 @@ public class UserService {
             return expensesList;
         }).collect(Collectors.toList());
     }
+
+    public Boolean createCompany(CreateCompanyRequestDto dto) {
+        Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+        if (user.isPresent() && user.get().getRole().equals(ERole.ADMIN)) {
+            Company company = CompanyMapper.INSTANCE.toCompany(dto);
+            companyRepository.save(company);
+        } else {
+            throw new UserException(ErrorType.AUTHORITY_ERROR);
+        }
+        return true;
+
+    }
+
+
+    public Boolean updateCompany(UpdateCompanyRequestDto dto) {
+        Optional<Company> company = companyRepository.findById(dto.getId());
+        if (company.isEmpty()) {
+            throw new UserException(ErrorType.COMPANY_NOT_FOUND);
+        }
+        Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+        if (user.isPresent() && user.get().getRole().equals(ERole.ADMIN)) {
+            company.get().setName(dto.getName());
+            company.get().setTitle(dto.getTitle());
+            company.get().setTaxNumber(dto.getTaxNumber());
+            company.get().setAddress(dto.getAddress());
+            company.get().setPhone(dto.getPhone());
+            company.get().setEmail(dto.getEmail());
+            company.get().setNumberOfEmployees(dto.getNumberOfEmployees());
+            company.get().setYearOfEstablishment(dto.getYearOfEstablishment());
+            companyRepository.save(company.get());
+        } else {
+            throw new UserException(ErrorType.AUTHORITY_ERROR);
+        }
+        return true;
+
+    }
+
+
+//    public Boolean deleteCompany(String id) {
+//        Optional<Company> company = companyRepository.findById(id);
+//        if (company.isEmpty()) {
+//            throw new UserException(ErrorType.COMPANY_NOT_FOUND);
+//        }
+//        companyRepository.delete(company.get());
+//        return true;
+//    }
+
+
+    public List<Company> findAllCompanies(String token) {
+        Optional<Long> authId = jwtTokenManager.getIdByToken(token);
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+        if (user.isPresent() && user.get().getRole().equals(ERole.ADMIN)) {
+            return companyRepository.findAll();
+        } else {
+            throw new UserException(ErrorType.AUTHORITY_ERROR);
+        }
+    }
+
+
 
 }
