@@ -16,13 +16,9 @@ import java.time.LocalDate;
 public class PermissionListResponseDtoForRequestUser {
     private String responseUserId;
     private String permissionType;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate permissionStart;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate permissionEnd;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate requestDate;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate responseDate;
     private int permissionDuration;
     private EState state;

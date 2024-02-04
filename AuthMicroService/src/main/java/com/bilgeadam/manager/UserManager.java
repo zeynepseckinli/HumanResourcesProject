@@ -1,7 +1,9 @@
 package com.bilgeadam.manager;
 
 import com.bilgeadam.dto.request.AuthStateUpdateRequestDto;
+import com.bilgeadam.dto.request.GetProfileByTokenRequestDto;
 import com.bilgeadam.dto.request.UserSaveRequestDto;
+import com.bilgeadam.dto.response.UserResponseDto;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +19,14 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(url = "http://localhost:9092/api/v1/user",name = "userManager")
 public interface UserManager {
 
-    @GetMapping("/getmessage")
+    @GetMapping("/get-message")
     public String getMessage();
     @PostMapping("/save")
     public ResponseEntity<Void> save(@RequestBody @Valid UserSaveRequestDto dto);
-    @PutMapping("/updateUserState")
+    @PutMapping("/update-user-state")
     public ResponseEntity<Boolean> updateUserState(@RequestBody @Valid AuthStateUpdateRequestDto dto);
 
+    @PostMapping("/get-profile")
+    public ResponseEntity<UserResponseDto> getProfileByToken(@RequestBody @Valid GetProfileByTokenRequestDto dto);
 
 }

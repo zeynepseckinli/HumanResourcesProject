@@ -29,12 +29,12 @@ public class AuthService {
         if(authOptional.isEmpty()){
             throw new AuthException(ErrorType.LOGIN_ERROR);
         }
-        if(!authOptional.get().getState().equals(EState.ACTIVE)){
-            throw new AuthException(ErrorType.ACCOUNT_NOT_ACTIVE);
-            //TODO: sifre guncellemeye yonlendirip state.ACTIVE olarak duzenlenecek
-            //changePassword metotu kullanılacak
-            //ya da giriş yapılacak ancak pending stateindekiler sadece password değişikliği yaparak active olabilecek
-        }
+//        if(!authOptional.get().getState().equals(EState.ACTIVE)){
+//            throw new AuthException(ErrorType.ACCOUNT_NOT_ACTIVE);
+//            //TODO: sifre guncellemeye yonlendirip state.ACTIVE olarak duzenlenecek
+//            //changePassword metotu kullanılacak
+//            //ya da giriş yapılacak ancak pending stateindekiler sadece password değişikliği yaparak active olabilecek
+//        }
         Optional<String> jwtToken = jwtTokenManager.createToken(authOptional.get().getId(), authOptional.get().getRole(), authOptional.get().getState());
         if(jwtToken.isEmpty())
             throw new AuthException(ErrorType.TOKEN_ERROR);
@@ -49,28 +49,19 @@ public class AuthService {
     }
 
     public Auth save(SaveAuthRequestDto dto) {
-        authRepository.findOptionalByEmail(dto.getEmail())
-          .ifPresent(auth->{
-            throw new AuthException(ErrorType.USERNAME_DUPLICATE);
-        });
+//        authRepository.findOptionalByEmail(dto.getEmail())
+//          .ifPresent(auth->{
+//            throw new AuthException(ErrorType.USERNAME_DUPLICATE);
+//        });
 
         Auth auth = AuthMapper.INSTANCE.fromDto(dto);
         auth.setCreateDate(LocalDate.now());
         auth.setUpdateDate(LocalDate.now());
-        auth.setState(EState.ACTIVE);
-        authRepository.save(auth);
-        auth.setState(EState.ACTIVE);
+        auth.setState(EState.PENDING);
         return authRepository.save(auth);
-
-//                userManager.save(UserSaveRequestDto.builder()
-//                        .authId(auth.getId())
-//                        .email(auth.getEmail())
-//                .build());
     }
 
-//    public Long findAuthIdByEmail(String email){
-//        return authRepository.findAuthIdByEmail(email);
-//    }
+
 
     public Boolean changePassword(ChangePasswordDto dto){
         Optional<Long> id= jwtTokenManager.getIdByToken(dto.getJwtToken());
@@ -86,8 +77,22 @@ public class AuthService {
                 .selectedState(EState.ACTIVE)
                 .authId(id.get())
                 .build());
+
         return true;
     }
+
+//    public Boolean forgotPassword(ForgotPasswordRequestDto dto) {
+//        Optional<Long> id= jwtTokenManager.getIdByToken(dto.getJwtToken());
+//        if (id.isEmpty()) {throw new AuthException(ErrorType.INVALID_TOKEN);}
+//        Optional<Auth> auth= authRepository.findOptionalById(id.get());
+//        if (auth.isEmpty() ) { throw new AuthException(ErrorType.USER_NOT_FOUND);}
+//        auth.get().setState(EState.PENDING);
+//
+//
+//
+//
+//    }
+
 
     public Boolean updateAuth(AuthUpdateRequestDto dto) {
         try {

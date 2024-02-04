@@ -23,9 +23,11 @@ public class UserProfile extends BaseEntity {
     private String id;
     private Long authId;
     private String name;
-    private String secondName;
+    @Builder.Default
+    private String secondName = "";
     private String surname;
-    private String secondSurname;
+    @Builder.Default
+    private String secondSurname = "";
     private String email;
     private String activationCode;
     private String personalEmail;
@@ -33,7 +35,7 @@ public class UserProfile extends BaseEntity {
     private String birthPlace;
     private String occupation;
     private String department;
-    private String company;
+    private String companyId;
     private String address;
     private String phone;
     @Builder.Default

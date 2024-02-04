@@ -13,15 +13,10 @@ import com.bilgeadam.mapper.UserMapper;
 import com.bilgeadam.rabbitmq.model.RegisterModel;
 import com.bilgeadam.rabbitmq.producer.RegisterMailProducer;
 import com.bilgeadam.rabbitmq.producer.RegisterProducer;
-import com.bilgeadam.repository.AdvanceRepository;
-import com.bilgeadam.repository.ExpenseRepository;
-import com.bilgeadam.repository.PermissionRepository;
-import com.bilgeadam.repository.UserRepository;
-import com.bilgeadam.repository.entity.Advance;
-import com.bilgeadam.repository.entity.Expense;
-import com.bilgeadam.repository.entity.Permission;
-import com.bilgeadam.repository.entity.UserProfile;
+import com.bilgeadam.repository.*;
+import com.bilgeadam.repository.entity.*;
 import com.bilgeadam.utility.JwtTokenManager;
+import com.bilgeadam.utility.enums.ERole;
 import com.bilgeadam.utility.enums.EState;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
@@ -51,6 +46,7 @@ public class UserService {
     private final CloudinaryConfig cloudinaryConfig;
     private final ExpenseRepository expenseRepository;
     private final RegisterMailProducer registerMailProducer;
+    private final CompanyRepository companyRepository;
 
 
 
@@ -64,27 +60,41 @@ public class UserService {
 
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
     public Boolean createUser(CreateUserRequestDto dto){
-        userRepository.findOptionalByEmail(dto.getEmail())
-                .ifPresent(userProfile -> {
-                    throw new UserException(ErrorType.USERNAME_DUPLICATE);
-                });
-        //auth save
+//        userRepository.findOptionalByEmail(dto.getEmail())
+//                .ifPresent(userProfile -> {
+//                    throw new UserException(ErrorType.USERNAME_DUPLICATE);
+//                });
+//        //auth save
         String randomPass = generateRandomPassword(8);
+        String email= generateEmail(dto);
         ResponseEntity<SaveAuthResponseDto> authDto = authManager.save(SaveAuthRequestDto.builder()
-                        .email(dto.getEmail())
+                        .email(email)
                         .password(randomPass)
+                        .role(dto.getRole())
                 .build());
-
         SaveAuthResponseDto saveAuthResponseDto = authDto.getBody();
         UserProfile user = UserMapper.INSTANCE.fromCreateUserRequestDto(dto);
         user.setAuthId(saveAuthResponseDto.getAuthId());
+        user.setEmail(email);
         user.setActivationCode(randomPass);
+        user.setState(EState.PENDING);
+        user.setCreateDate(LocalDate.now());
+        user.setUpdateDate(LocalDate.now());
         userRepository.save(user);
         registerMailProducer.sendActivationCode(UserMapper.INSTANCE.fromUserToRegisterModel(user));
         return true;
     }
 
-    public static String generateRandomPassword(int length) {
+    public String convertToAscii(String mail) {
+        mail = mail.replaceAll("ı", "i").replaceAll("ğ", "g").replaceAll("ü", "u")
+                .replaceAll("ş", "s").replaceAll("ö", "o").replaceAll("ç", "c")
+                .replaceAll("İ", "I").replaceAll("Ğ", "G").replaceAll("Ü", "U")
+                .replaceAll("Ş", "S").replaceAll("Ö", "O").replaceAll("Ç", "C");
+        String regex = "[^a-zA-Z0-9._@-]";
+        return mail.replaceAll(regex, "");
+    }
+
+    public String generateRandomPassword(int length) {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         Random random = new Random();
         StringBuilder password = new StringBuilder();
@@ -94,6 +104,44 @@ public class UserService {
         }
         return password.toString();
     }
+
+    public String generateEmail(CreateUserRequestDto dto){
+        Company company = companyRepository.findById(dto.getCompanyId())
+                .orElseThrow(() -> new RuntimeException("Belirtilen CompanyId ile eşleşen bir şirket bulunamadı."));
+        String username = dto.getName();
+        String secondName = dto.getSecondName();
+        String surname = dto.getSurname();
+        String secondSurname = dto.getSecondSurname();
+        String companyName = company.getName();
+        String email = username + secondName + "." + surname + secondSurname + "@" + companyName + ".com";
+        return convertToAscii(email.toLowerCase());
+    }
+
+    public Boolean forgotPassword(ForgotPasswordRequestDto dto) {
+
+        Optional<UserProfile> user =userRepository.findByPersonalEmail(dto.getPersonalEmail());
+        if (user.isEmpty()) {
+            throw new UserException(ErrorType.USER_NOT_FOUND);
+        }
+        if (!user.get().getPhone().equals(dto.getPhone())){
+            throw new UserException(ErrorType.BAD_REQUEST_ERROR);
+        }
+        String randomPass = generateRandomPassword(8);
+        user.get().setActivationCode(randomPass);
+        authManager.updateAuthState(AuthStateUpdateRequestDto.builder()
+                        .authId(user.get().getAuthId())
+                        .selectedState(EState.PENDING)
+                .build());
+        authManager.updateAuth(AuthUpdateRequestDto.builder()
+                        .authId(user.get().getAuthId())
+                        .password(randomPass)
+                .build());
+        user.get().setState(EState.PENDING);
+        userRepository.save(user.get());
+        registerMailProducer.sendActivationCode(UserMapper.INSTANCE.fromUserToRegisterModel(user.get()));
+        return true;
+    }
+
 
     public UserResponseDto getProfileByToken(GetProfileByTokenRequestDto dto) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
@@ -108,6 +156,8 @@ public class UserService {
     }
 
     public Boolean updateUser(UserUpdateRequestDto dto) {
+        Company company = companyRepository.findById(dto.getCompanyId())
+                .orElseThrow(() -> new RuntimeException("Belirtilen CompanyId ile eşleşen bir şirket bulunamadı."));
         Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
@@ -125,6 +175,13 @@ public class UserService {
     }
 
     public Boolean updateUserState(AuthStateUpdateRequestDto dto){
+        Optional<Long> idByToken = jwtTokenManager.getIdByToken(dto.getToken());
+        ERole roleByToken = jwtTokenManager.getRoleByToken(dto.getToken()).get();
+        if (idByToken.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        } else if (!(roleByToken==ERole.ADMIN)) {
+            throw new UserException(ErrorType.AUTHORITY_ERROR);
+        }
         Optional<UserProfile> user = userRepository.findOptionalByAuthId(dto.getAuthId());
         if (user.isEmpty()){
             throw new UserException(ErrorType.REQUEST_NOT_FOUND);
@@ -134,6 +191,8 @@ public class UserService {
         userRepository.save(user.get());
         return true;
     }
+
+//    public Long tokenControl(String token, ERole role, EState state )///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public Boolean updateUserRole(AuthRoleUpdateRequestDto dto){
         Optional<UserProfile> user = userRepository.findOptionalByAuthId(dto.getAuthId());
@@ -328,6 +387,22 @@ public class UserService {
        // expense.setUrl(url);
         expenseRepository.save(expense);
         return true;
+    }
+
+    public String updateExpenseImage(MultipartFile file, String token, String id){
+        Optional<Long> authId = jwtTokenManager.getIdByToken(token);
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+        if (user.isEmpty()) {
+            throw new UserException(ErrorType.USER_NOT_FOUND);
+        }
+        Optional<Expense> expense = expenseRepository.findById(id);
+        String url = imageUpload(file);
+        expense.get().setUrl(url);
+        expenseRepository.save(expense.get());
+        return url;
     }
 
     public Boolean updateExpenseState(UpdateStateRequestDto dto) {

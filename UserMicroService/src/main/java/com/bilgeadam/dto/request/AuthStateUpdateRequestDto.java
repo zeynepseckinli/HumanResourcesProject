@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class AuthStateUpdateRequestDto {
+    private String token;
     private Long authId;
     private EState selectedState;
 }

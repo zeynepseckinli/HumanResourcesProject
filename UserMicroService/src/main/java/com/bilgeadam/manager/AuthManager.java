@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(url = "http://localhost:9090/api/v1/auth",name = "authManager")
 public interface AuthManager {
 
-    @GetMapping("/getmessage")
+    @GetMapping("/get-message")
     public String getMessage();
 
     @PostMapping("/save")
@@ -27,7 +27,9 @@ public interface AuthManager {
     public ResponseEntity<Boolean> updateAuth(@RequestBody AuthUpdateRequestDto dto);
 
 
-    @PostMapping("/updateRole")
+    @PostMapping("/update-role")
     public ResponseEntity<Boolean> updateRole(@RequestBody AuthRoleUpdateRequestDto dto);
 
+    @PostMapping("/update-state")
+    public ResponseEntity<Boolean> updateAuthState(@RequestBody AuthStateUpdateRequestDto dto);
     }

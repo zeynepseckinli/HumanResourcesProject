@@ -18,11 +18,8 @@ public class CreatePermissionRequestDto {
     private String token;
     private String responseUserId;
     private String permissionType;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate dateOfRequest;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate startOfPermission;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate endOfPermission;
     private int permissionDuration;
 

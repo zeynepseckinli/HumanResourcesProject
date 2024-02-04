@@ -1,6 +1,7 @@
 package com.bilgeadam.dto.request;
 
-import com.bilgeadam.utility.enums.EState;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,8 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class AuthStateUpdateRequestDto {
-    private String token;
-    private Long authId;
-    private EState selectedState;
+public class GetProfileByTokenRequestDto {
+    @NotNull
+    @Size(min = 30)
+    String token;
 }

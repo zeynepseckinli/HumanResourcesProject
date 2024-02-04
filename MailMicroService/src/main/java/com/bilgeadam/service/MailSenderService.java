@@ -16,9 +16,11 @@ public class MailSenderService {
     public void sendMail(RegisterMailModel model){
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom("${java11mailusername}");
-        mailMessage.setTo(model.getEmail());
+        mailMessage.setTo(model.getPersonalEmail());
         mailMessage.setSubject("HR-Management Aktivasyon Kodunuz");
-        mailMessage.setText("Degerli "+ model.getName()+" Hesap Dogrulama Kodunuz : " + model.getActivationCode());
+        mailMessage.setText("Degerli "+ model.getName()
+                +" Mail Adresiniz : " + model.getEmail()
+                +" Hesap Dogrulama Kodunuz : " + model.getActivationCode());
         javaMailSender.send(mailMessage);
     }
 }

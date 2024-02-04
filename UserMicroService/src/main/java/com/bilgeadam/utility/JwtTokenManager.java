@@ -105,4 +105,25 @@ public class JwtTokenManager {
             return  Optional.empty();
         }
     }
+
+
+    public Optional<ERole> getRoleByToken(String token) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC512(SECRETKEY);
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .withIssuer(ISSUER).build();
+            DecodedJWT decodedJWT = verifier.verify(token);
+            if (decodedJWT == null) {
+                return Optional.empty();
+            }
+            String rolString = decodedJWT.getClaim("role").asString();
+            if (rolString == null) {
+                return Optional.empty();
+            }
+            ERole rol = ERole.valueOf(rolString);
+            return Optional.of(rol);
+        } catch (Exception exception) {
+            return Optional.empty();
+        }
+    }
 }

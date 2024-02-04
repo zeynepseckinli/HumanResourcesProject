@@ -19,18 +19,17 @@ import static com.bilgeadam.constants.RestApiUrls.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(AUTH)
-@CrossOrigin("*")
+@CrossOrigin("/api/v1/user")
 public class AuthController {
 
     private final AuthService authService;
 
-    @GetMapping("/getmessage")
+    @GetMapping("/get-message")
     public String getMessage(){
         return "This is Auth Service";
     }
 
-    @PostMapping(LOGIN)
-    @CrossOrigin("*")
+    @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginRequestDto dto){
         return ResponseEntity.ok(authService.login(dto));
     }
@@ -55,20 +54,22 @@ public class AuthController {
     }
 
     @Hidden
-    @PostMapping("/updateRole")
+    @PostMapping("/update-role")
     public ResponseEntity<Boolean> updateRole(@RequestBody AuthRoleUpdateRequestDto dto){
         return ResponseEntity.ok(authService.updateRole(dto));
     }
 
 
-    @PostMapping("/updateState")
+    @PostMapping("/update-state")
     public ResponseEntity<Boolean> updateAuthState(@RequestBody AuthStateUpdateRequestDto dto){
         return ResponseEntity.ok(authService.updateAuthState(dto));
     }
 
-    @PostMapping("/changePassword")
+    @PostMapping("/change-password")
     public ResponseEntity<Boolean> changePassword(@RequestBody @Valid ChangePasswordDto dto){
         return ResponseEntity.ok(authService.changePassword(dto));
     }
+
+
 
 }
