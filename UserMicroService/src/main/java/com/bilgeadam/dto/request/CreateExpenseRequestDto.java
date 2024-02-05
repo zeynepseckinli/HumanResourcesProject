@@ -13,7 +13,6 @@ import java.time.LocalDate;
 @Data
 public class CreateExpenseRequestDto {
     private String token;
-    private String responseUserId;
     private LocalDate requestDate;
     private String description;
     private Double expenseAmount;

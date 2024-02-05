@@ -13,7 +13,6 @@ import java.time.LocalDate;
 @Data
 public class CreateAdvanceRequestDto {
     private String token;
-    private String responseUserId;
     private Long advanceAmount;
     private String unitOfCurrency;
     private String description;

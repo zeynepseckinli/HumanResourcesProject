@@ -24,6 +24,7 @@ public class CreateUserRequestDto {
     private String occupation;
     private String department;
     private String companyId;
+    private String managerId;
     private String address;
     private String phone;
     private Long salary;

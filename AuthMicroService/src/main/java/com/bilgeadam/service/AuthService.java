@@ -71,14 +71,17 @@ public class AuthService {
         if (!(auth.get().getPassword().equals(dto.getOldPassword()))) {throw new AuthException(ErrorType.PASSWORD_NOT_MATCH);}
         if (!(dto.getNewPassword().equals(dto.getConfirmPassword()))) {throw new AuthException(ErrorType.PASSWORD_NOT_MATCH);}
         auth.get().setPassword(dto.getNewPassword());
-//        auth.get().setState(EState.ACTIVE);
+        auth.get().setState(EState.ACTIVE);
         authRepository.save(auth.get());
-        updateAuthState(AuthStateUpdateRequestDto.builder()
+
+        AuthStateUpdateRequestDto dto2 = AuthStateUpdateRequestDto.builder()
+                .token(dto.getJwtToken())
                 .selectedState(EState.ACTIVE)
                 .authId(id.get())
-                .build());
-
+                .build();
+        userManager.updateUserStateForPassword(dto2);
         return true;
+
     }
 
 //    public Boolean forgotPassword(ForgotPasswordRequestDto dto) {
@@ -92,8 +95,6 @@ public class AuthService {
 //
 //
 //    }
-
-
     public Boolean updateAuth(AuthUpdateRequestDto dto) {
         try {
             Optional<Auth> auth = authRepository.findById(dto.getAuthId());
@@ -133,7 +134,7 @@ public class AuthService {
         auth.get().setState(dto.getSelectedState());
         auth.get().setUpdateDate(LocalDate.now());
         authRepository.save(auth.get());
-        userManager.updateUserState(dto);
+        userManager.updateUserStateForPassword(dto);
         return true;
     }
 

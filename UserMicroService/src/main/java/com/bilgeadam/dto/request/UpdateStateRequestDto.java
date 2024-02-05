@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class UpdateStateRequestDto {
 
+    String token;
     String id;
     EState selectedState;
 

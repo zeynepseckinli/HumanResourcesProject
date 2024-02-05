@@ -16,7 +16,6 @@ import java.time.LocalDate;
 public class CreatePermissionRequestDto {
 
     private String token;
-    private String responseUserId;
     private String permissionType;
     private LocalDate dateOfRequest;
     private LocalDate startOfPermission;

@@ -1,6 +1,7 @@
 package com.bilgeadam.repository.entity;
 
 import com.bilgeadam.utility.enums.ERole;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +23,8 @@ public class UserProfile extends BaseEntity {
     @Id
     private String id;
     private Long authId;
+    @NotNull
+    private String managerId;
     private String name;
     @Builder.Default
     private String secondName = "";

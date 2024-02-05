@@ -4,6 +4,7 @@ import com.bilgeadam.dto.request.AuthStateUpdateRequestDto;
 import com.bilgeadam.dto.request.GetProfileByTokenRequestDto;
 import com.bilgeadam.dto.request.UserSaveRequestDto;
 import com.bilgeadam.dto.response.UserResponseDto;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -28,5 +29,8 @@ public interface UserManager {
 
     @PostMapping("/get-profile")
     public ResponseEntity<UserResponseDto> getProfileByToken(@RequestBody @Valid GetProfileByTokenRequestDto dto);
+
+    @PutMapping("/update-user-state-for-password")
+    public ResponseEntity<Boolean> updateUserStateForPassword(AuthStateUpdateRequestDto dto);
 
 }
