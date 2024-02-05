@@ -46,8 +46,6 @@ public class UserService {
     private final CompanyRepository companyRepository;
 
 
-
-
 //    public UserProfile saveUser(UserSaveRequestDto dto) {
 //        return userRepository.save(UserProfile.builder()
 //                .email(dto.getEmail())
@@ -56,18 +54,18 @@ public class UserService {
 //    }
 
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-    public Boolean createUser(CreateUserRequestDto dto){
+    public Boolean createUser(CreateUserRequestDto dto) {
 //        userRepository.findOptionalByEmail(dto.getEmail())
 //                .ifPresent(userProfile -> {
 //                    throw new UserException(ErrorType.USERNAME_DUPLICATE);
 //                });
 //        //auth save
         String randomPass = generateRandomPassword(8);
-        String email= generateEmail(dto);
+        String email = generateEmail(dto);
         ResponseEntity<SaveAuthResponseDto> authDto = authManager.save(SaveAuthRequestDto.builder()
-                        .email(email)
-                        .password(randomPass)
-                        .role(dto.getRole())
+                .email(email)
+                .password(randomPass)
+                .role(dto.getRole())
                 .build());
         SaveAuthResponseDto saveAuthResponseDto = authDto.getBody();
         UserProfile user = UserMapper.INSTANCE.fromCreateUserRequestDto(dto);
@@ -102,7 +100,7 @@ public class UserService {
         return password.toString();
     }
 
-    public String generateEmail(CreateUserRequestDto dto){
+    public String generateEmail(CreateUserRequestDto dto) {
         Company company = companyRepository.findById(dto.getCompanyId())
                 .orElseThrow(() -> new RuntimeException("Belirtilen CompanyId ile eşleşen bir şirket bulunamadı."));
         String username = dto.getName();
@@ -116,22 +114,22 @@ public class UserService {
 
     public Boolean forgotPassword(ForgotPasswordRequestDto dto) {
 
-        Optional<UserProfile> user =userRepository.findByPersonalEmail(dto.getPersonalEmail());
+        Optional<UserProfile> user = userRepository.findByPersonalEmail(dto.getPersonalEmail());
         if (user.isEmpty()) {
             throw new UserException(ErrorType.USER_NOT_FOUND);
         }
-        if (!user.get().getPhone().equals(dto.getPhone())){
+        if (!user.get().getPhone().equals(dto.getPhone())) {
             throw new UserException(ErrorType.BAD_REQUEST_ERROR);
         }
         String randomPass = generateRandomPassword(8);
         user.get().setActivationCode(randomPass);
         authManager.updateAuthState(AuthStateUpdateRequestDto.builder()
-                        .authId(user.get().getAuthId())
-                        .selectedState(EState.PENDING)
+                .authId(user.get().getAuthId())
+                .selectedState(EState.PENDING)
                 .build());
         authManager.updateAuth(AuthUpdateRequestDto.builder()
-                        .authId(user.get().getAuthId())
-                        .password(randomPass)
+                .authId(user.get().getAuthId())
+                .password(randomPass)
                 .build());
         user.get().setState(EState.PENDING);
         userRepository.save(user.get());
@@ -163,24 +161,24 @@ public class UserService {
         if (user.isPresent()) {
             userRepository.save(UserMapper.INSTANCE.fromUpdateDtoToUserProfile(dto, user.get()));
             authManager.updateAuth(AuthUpdateRequestDto.builder()
-                            .authId(authId.get())
-                            .email(dto.getEmail())
+                    .authId(authId.get())
+                    .email(dto.getEmail())
                     .build());
             return true;
         }
         throw new UserException(ErrorType.USER_NOT_FOUND);
     }
 
-    public Boolean updateUserState(AuthStateUpdateRequestDto dto){
+    public Boolean updateUserState(AuthStateUpdateRequestDto dto) {
         Optional<Long> idByToken = jwtTokenManager.getIdByToken(dto.getToken());
         ERole roleByToken = jwtTokenManager.getRoleByToken(dto.getToken()).get();
         if (idByToken.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
-        } else if (!(roleByToken==ERole.ADMIN)) {
+        } else if (!(roleByToken == ERole.ADMIN)) {
             throw new UserException(ErrorType.AUTHORITY_ERROR);
         }
         Optional<UserProfile> user = userRepository.findOptionalByAuthId(dto.getAuthId());
-        if (user.isEmpty()){
+        if (user.isEmpty()) {
             throw new UserException(ErrorType.REQUEST_NOT_FOUND);
         }
         user.get().setState(dto.getSelectedState());
@@ -191,9 +189,9 @@ public class UserService {
 
 //    public Long tokenControl(String token, ERole role, EState state )///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public Boolean updateUserRole(AuthRoleUpdateRequestDto dto){
+    public Boolean updateUserRole(AuthRoleUpdateRequestDto dto) {
         Optional<UserProfile> user = userRepository.findOptionalByAuthId(dto.getAuthId());
-        if (user.isEmpty()){
+        if (user.isEmpty()) {
             throw new UserException(ErrorType.REQUEST_NOT_FOUND);
         }
         user.get().setRole(dto.getSelectedRole());
@@ -204,7 +202,7 @@ public class UserService {
     }
 
 
-    public String updateUserImage(MultipartFile file, String token){
+    public String updateUserImage(MultipartFile file, String token) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
@@ -220,7 +218,7 @@ public class UserService {
     }
 
 
-    public String imageUpload(MultipartFile file){
+    public String imageUpload(MultipartFile file) {
         Map<String, String> config = new HashMap<>();
         config.put("cloud_name", cloudinaryConfig.getCloud_name());
         config.put("api_key", cloudinaryConfig.getApi_key());
@@ -229,10 +227,10 @@ public class UserService {
         Cloudinary cloudinary = new Cloudinary(config);
 
         try {
-            Map<?,?> result = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            Map<?, ?> result = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
             String url = (String) result.get("url");
             return url;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -249,7 +247,7 @@ public class UserService {
             throw new UserException(ErrorType.USER_NOT_FOUND);
         }
         if (dto.getAdvanceAmount() > user.get().getSalary() * 3) {
-                throw new UserException(ErrorType.ADVANCE_ERROR);
+            throw new UserException(ErrorType.ADVANCE_ERROR);
         }
         Advance advance = AdvanceMapper.INSTANCE.fromDto(dto);
         advance.setRequestUserId(user.get().getId());
@@ -260,7 +258,7 @@ public class UserService {
 
     public Boolean updateAdvanceState(UpdateStateRequestDto dto) {
         Optional<Advance> advance = advanceRepository.findById(dto.getId());
-        if(advance.isEmpty()) {
+        if (advance.isEmpty()) {
             throw new UserException(ErrorType.REQUEST_NOT_FOUND);
         }
         advance.get().setState(dto.getSelectedState());
@@ -269,7 +267,7 @@ public class UserService {
         return true;
     }
 
-    public List<AdvanceListResponseDtoForRequestUser> findAllAdvancesForRequestUser (String token) {
+    public List<AdvanceListResponseDtoForRequestUser> findAllAdvancesForRequestUser(String token) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
@@ -283,7 +281,7 @@ public class UserService {
         }).collect(Collectors.toList());
     }
 
-    public List<AdvanceListResponseDtoForResponseUser> findAllAdvancesForResponseUser (String token) {
+    public List<AdvanceListResponseDtoForResponseUser> findAllAdvancesForResponseUser(String token) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
@@ -324,7 +322,7 @@ public class UserService {
 
     public Boolean updatePermissionState(UpdateStateRequestDto dto) {
         Optional<Permission> permission = permissionRepository.findById(dto.getId());
-        if(permission.isEmpty()) {
+        if (permission.isEmpty()) {
             throw new UserException(ErrorType.REQUEST_NOT_FOUND);
         }
         permission.get().setState(dto.getSelectedState());
@@ -333,7 +331,7 @@ public class UserService {
         return true;
     }
 
-    public List<PermissionListResponseDtoForRequestUser> findAllPermissionsForRequestUser (String token) {
+    public List<PermissionListResponseDtoForRequestUser> findAllPermissionsForRequestUser(String token) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
@@ -347,7 +345,7 @@ public class UserService {
         }).collect(Collectors.toList());
     }
 
-    public List<PermissionListResponseDtoForResponseUser> findAllPermissionsForResponseUser (String token) {
+    public List<PermissionListResponseDtoForResponseUser> findAllPermissionsForResponseUser(String token) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
@@ -377,16 +375,16 @@ public class UserService {
         if (user.isEmpty()) {
             throw new UserException(ErrorType.USER_NOT_FOUND);
         }
-       // String url = imageUpload(file);
+        // String url = imageUpload(file);
         Expense expense = ExpenseMapper.INSTANCE.fromDto(dto);
         expense.setRequestUserId(user.get().getId());
         expense.setState(EState.PENDING);
-       // expense.setUrl(url);
+        // expense.setUrl(url);
         expenseRepository.save(expense);
         return true;
     }
 
-    public String updateExpenseImage(MultipartFile file, String token, String id){
+    public String updateExpenseImage(MultipartFile file, String token, String id) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
@@ -404,7 +402,7 @@ public class UserService {
 
     public Boolean updateExpenseState(UpdateStateRequestDto dto) {
         Optional<Expense> expense = expenseRepository.findById(dto.getId());
-        if(expense.isEmpty()) {
+        if (expense.isEmpty()) {
             throw new UserException(ErrorType.REQUEST_NOT_FOUND);
         }
         expense.get().setState(dto.getSelectedState());
@@ -413,7 +411,7 @@ public class UserService {
         return true;
     }
 
-    public List<ExpensesListResponseDtoForRequestUser> findAllExpensesForRequestUser (String token) {
+    public List<ExpensesListResponseDtoForRequestUser> findAllExpensesForRequestUser(String token) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
@@ -427,7 +425,7 @@ public class UserService {
         }).collect(Collectors.toList());
     }
 
-    public List<ExpensesListResponseDtoForResponseUser> findAllExpensesForResponseUser (String token) {
+    public List<ExpensesListResponseDtoForResponseUser> findAllExpensesForResponseUser(String token) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
@@ -456,6 +454,9 @@ public class UserService {
         Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
         if (user.isPresent() && user.get().getRole().equals(ERole.ADMIN)) {
             Company company = CompanyMapper.INSTANCE.toCompany(dto);
+            company.setCreateDate(LocalDate.now());
+            company.setUpdateDate(LocalDate.now());
+            company.setState(EState.ACTIVE);
             companyRepository.save(company);
         } else {
             throw new UserException(ErrorType.AUTHORITY_ERROR);
@@ -484,6 +485,7 @@ public class UserService {
             company.get().setEmail(dto.getEmail());
             company.get().setNumberOfEmployees(dto.getNumberOfEmployees());
             company.get().setYearOfEstablishment(dto.getYearOfEstablishment());
+            company.get().setUpdateDate(LocalDate.now());
             companyRepository.save(company.get());
         } else {
             throw new UserException(ErrorType.AUTHORITY_ERROR);
@@ -515,7 +517,6 @@ public class UserService {
             throw new UserException(ErrorType.AUTHORITY_ERROR);
         }
     }
-
 
 
 }
