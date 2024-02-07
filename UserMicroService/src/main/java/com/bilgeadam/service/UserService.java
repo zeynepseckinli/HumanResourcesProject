@@ -576,4 +576,31 @@ public class UserService {
     }
 
 
+    public List<UserResponseDto> findAllUserProfileByManagerId(GetProfileByTokenRequestDto dto) {
+        Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
+        if (authId.isEmpty()){
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> manager = userRepository.findOptionalByAuthId(authId.get());
+        if (manager.isPresent() && manager.get().getRole().equals(ERole.MANAGER)){
+            List<UserProfile> users = userRepository.findAllUserProfileByManagerId(manager.get().getId());
+            return users.stream()
+                    .map(user -> UserMapper.INSTANCE.toUserResponseDto(user))
+                    .collect(Collectors.toList());
+        }
+        throw new UserException(ErrorType.AUTHORITY_ERROR);
+    }
+
+    /**
+     *         return expenseRepository.findAllByResponseUserId(user.get().getId()).stream().map(expense -> {
+     *             ExpensesListResponseDtoForResponseUser expensesList = ExpenseMapper.INSTANCE.toDtoForResponseUser(expense);
+     *             UserProfile requestUser = userRepository.findById(expensesList.getRequestUserId()).get();
+     *             expensesList.setName(requestUser.getName());
+     *             expensesList.setSecondName(requestUser.getSecondName());
+     *             expensesList.setSurname(requestUser.getSurname());
+     *             expensesList.setSecondSurname(requestUser.getSecondSurname());
+     *             expensesList.setEmail(requestUser.getEmail());
+     *             return expensesList;
+     *         }).collect(Collectors.toList());
+     */
 }
