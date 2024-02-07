@@ -180,5 +180,10 @@ public class UserController {
         return ResponseEntity.ok(userService.findAllCompanies(token, state));
     }
 
+    @GetMapping("/find-all-employees-by-id")
+    public ResponseEntity<List<UserResponseDto>> findAllUserByManagerId(GetProfileByTokenRequestDto dto){
+        return ResponseEntity.ok(userService.findAllUserProfileByManagerId(dto));
+    }
+
 
 }
