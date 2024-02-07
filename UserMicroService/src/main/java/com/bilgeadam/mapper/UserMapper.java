@@ -16,6 +16,7 @@ public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
     UserResponseDto fromDto(final UserSaveRequestDto dto);
     UserResponseDto toUserResponseDto(final UserProfile userProfile);
+
     UserResponseDto fromUserUpdateRequestDto(final UserUpdateRequestDto dto);
     UserProfile toUser (final UserUpdateRequestDto dto);
     UserProfile fromCreateUserRequestDto(final CreateUserRequestDto dto);
@@ -24,5 +25,6 @@ public interface UserMapper {
     UserProfile fromUpdateDtoToUserProfile(UserUpdateRequestDto dto, @MappingTarget UserProfile user);
 
     RegisterMailModel fromUserToRegisterModel(final UserProfile user);
+
 }
 
