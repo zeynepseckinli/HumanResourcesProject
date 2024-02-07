@@ -31,6 +31,6 @@ public interface UserManager {
     public ResponseEntity<UserResponseDto> getProfileByToken(@RequestBody @Valid GetProfileByTokenRequestDto dto);
 
     @PutMapping("/update-user-state-for-password")
-    public ResponseEntity<Boolean> updateUserStateForPassword(AuthStateUpdateRequestDto dto);
+    public ResponseEntity<Boolean> updateUserStateForPassword(@RequestBody Long id);
 
 }

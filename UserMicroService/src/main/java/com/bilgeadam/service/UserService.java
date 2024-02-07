@@ -123,11 +123,8 @@ public class UserService {
         }
         String randomPass = generateRandomPassword(8);
         user.get().setActivationCode(randomPass);
-        authManager.updateAuthState(AuthStateUpdateRequestDto.builder()
-                .authId(user.get().getAuthId())
-                .selectedState(EState.PENDING)
-                .build());
         authManager.updateAuth(AuthUpdateRequestDto.builder()
+                .state(EState.PENDING)
                 .authId(user.get().getAuthId())
                 .password(randomPass)
                 .build());
@@ -187,12 +184,8 @@ public class UserService {
         return true;
     }
 
-    public Boolean updateUserStateForPassword(AuthStateUpdateRequestDto dto) {
-        Optional<Long> idByToken = jwtTokenManager.getIdByToken(dto.getToken());
-        if (idByToken.isEmpty()) {
-            throw new UserException(ErrorType.INVALID_TOKEN);
-        }
-        Optional<UserProfile> user = userRepository.findOptionalByAuthId(dto.getAuthId());
+    public Boolean updateUserStateForPassword(Long id) {
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(id);
         if (user.isEmpty()) {
             throw new UserException(ErrorType.REQUEST_NOT_FOUND);
         }
