@@ -34,6 +34,7 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(dto));
     }
 
+    @Hidden
     @PostMapping("/save")
     public ResponseEntity<SaveAuthResponseDto>  save (@RequestBody @Valid SaveAuthRequestDto dto){
         Auth auth= authService.save(dto);
@@ -48,6 +49,7 @@ public class AuthController {
 //    public ResponseEntity<Long> findAuthIdByEmail(@RequestBody String email){
 //        return ResponseEntity.ok(authService.findAuthIdByEmail(email));
 //    }
+    @Hidden
     @PutMapping("/update")
     public ResponseEntity<Boolean> updateAuth(@RequestBody AuthUpdateRequestDto dto){
         return ResponseEntity.ok(authService.updateAuth(dto));

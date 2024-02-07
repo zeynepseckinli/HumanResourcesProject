@@ -67,8 +67,8 @@ public class UserController {
 
 
     @PutMapping("/update-user-state-for-password")
-    public ResponseEntity<Boolean> updateUserStateForPassword(AuthStateUpdateRequestDto dto) {
-        return ResponseEntity.ok(userService.updateUserStateForPassword(dto));
+    public ResponseEntity<Boolean> updateUserStateForPassword(@RequestBody Long id){
+        return ResponseEntity.ok(userService.updateUserStateForPassword(id));
     }
 
     @PutMapping("/update-user-role")

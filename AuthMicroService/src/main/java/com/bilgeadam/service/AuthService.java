@@ -73,13 +73,7 @@ public class AuthService {
         auth.get().setPassword(dto.getNewPassword());
         auth.get().setState(EState.ACTIVE);
         authRepository.save(auth.get());
-
-        AuthStateUpdateRequestDto dto2 = AuthStateUpdateRequestDto.builder()
-                .token(dto.getJwtToken())
-                .selectedState(EState.ACTIVE)
-                .authId(id.get())
-                .build();
-        userManager.updateUserStateForPassword(dto2);
+        userManager.updateUserStateForPassword(id.get());
         return true;
 
     }
@@ -134,7 +128,7 @@ public class AuthService {
         auth.get().setState(dto.getSelectedState());
         auth.get().setUpdateDate(LocalDate.now());
         authRepository.save(auth.get());
-        userManager.updateUserStateForPassword(dto);
+        userManager.updateUserStateForPassword(dto.getAuthId());
         return true;
     }
 
