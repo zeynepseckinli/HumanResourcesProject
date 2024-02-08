@@ -1,5 +1,6 @@
 package com.bilgeadam.dto.request;
 
+import com.bilgeadam.utility.enums.EState;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,10 +19,16 @@ public class UpdateCompanyRequestDto {
     private String name;
     private String title;
     private String taxNumber;
+    private String taxAdministration;
+    private String logo;
     private String address;
     private String phone;
     private String email;
     private int numberOfEmployees;
     private LocalDate yearOfEstablishment;
+    private LocalDate contractStartDare;
+    private LocalDate contractEndDate;
+    private EState state;
+
 
 }
