@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Data
 public class CreateUserRequestDto {
-    private ERole role;
+    private String token;
     private String name;
     private String secondName;
     private String surname;
@@ -24,7 +24,6 @@ public class CreateUserRequestDto {
     private String occupation;
     private String department;
     private String companyId;
-    private String managerId;
     private String address;
     private String phone;
     private Long salary;
