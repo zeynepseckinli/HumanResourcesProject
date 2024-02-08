@@ -16,7 +16,7 @@ spring:
       host: localhost
       port: 27017
       database: UserProfileDB
-      username: defaultUSer
+      username: defaultUser
       password: bilge!*123
 
 
