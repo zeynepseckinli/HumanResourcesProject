@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class AuthRoleUpdateRequestDto {
-
+    private String token;
     private Long authId;
     private ERole selectedRole;
 }

@@ -55,17 +55,19 @@ public class UserService {
 
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
     public Boolean createUser(CreateUserRequestDto dto) {
-//        userRepository.findOptionalByEmail(dto.getEmail())
-//                .ifPresent(userProfile -> {
-//                    throw new UserException(ErrorType.USERNAME_DUPLICATE);
-//                });
-//        //auth save
+        Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> userProfile = userRepository.findOptionalByAuthId(authId.get());
+        if (userProfile.isEmpty()) {
+            throw new UserException(ErrorType.USER_NOT_FOUND);
+        }
         String randomPass = generateRandomPassword(8);
         String email = generateEmail(dto);
         ResponseEntity<SaveAuthResponseDto> authDto = authManager.save(SaveAuthRequestDto.builder()
                 .email(email)
                 .password(randomPass)
-                .role(dto.getRole())
                 .build());
         SaveAuthResponseDto saveAuthResponseDto = authDto.getBody();
         UserProfile user = UserMapper.INSTANCE.fromCreateUserRequestDto(dto);
@@ -75,7 +77,22 @@ public class UserService {
         user.setState(EState.PENDING);
         user.setCreateDate(LocalDate.now());
         user.setUpdateDate(LocalDate.now());
+        if (userProfile.get().getRole().equals(ERole.MANAGER)){
+            user.setRole(ERole.EMPLOYEE);
+            user.setManagerId(userProfile.get().getId());
+            authManager.updateRole(AuthRoleUpdateRequestDto.builder()
+                    .authId(user.getAuthId())
+                    .selectedRole(ERole.EMPLOYEE)
+                    .build());
+        } else if (userProfile.get().getRole().equals(ERole.ADMIN)) {
+            user.setRole(ERole.MANAGER);
+            authManager.updateRole(AuthRoleUpdateRequestDto.builder()
+                    .authId(user.getAuthId())
+                    .selectedRole(ERole.MANAGER)
+                    .build());
+        }
         userRepository.save(user);
+
         registerMailProducer.sendActivationCode(UserMapper.INSTANCE.fromUserToRegisterModel(user));
         return true;
     }
@@ -148,8 +165,8 @@ public class UserService {
     }
 
     public Boolean updateUser(UserUpdateRequestDto dto) {
-        Company company = companyRepository.findById(dto.getCompanyId())
-                .orElseThrow(() -> new RuntimeException("Belirtilen CompanyId ile eşleşen bir şirket bulunamadı."));
+//        Company company = companyRepository.findById(dto.getCompanyId())
+//                .orElseThrow(() -> new RuntimeException("Belirtilen CompanyId ile eşleşen bir şirket bulunamadı."));
         Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
@@ -157,10 +174,7 @@ public class UserService {
         Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
         if (user.isPresent()) {
             userRepository.save(UserMapper.INSTANCE.fromUpdateDtoToUserProfile(dto, user.get()));
-            authManager.updateAuth(AuthUpdateRequestDto.builder()
-                    .authId(authId.get())
-                    .email(dto.getEmail())
-                    .build());
+
             return true;
         }
         throw new UserException(ErrorType.USER_NOT_FOUND);
@@ -199,15 +213,24 @@ public class UserService {
 //    public Long tokenControl(String token, ERole role, EState state )///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public Boolean updateUserRole(AuthRoleUpdateRequestDto dto) {
-        Optional<UserProfile> user = userRepository.findOptionalByAuthId(dto.getAuthId());
-        if (user.isEmpty()) {
-            throw new UserException(ErrorType.REQUEST_NOT_FOUND);
+        Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
         }
-        user.get().setRole(dto.getSelectedRole());
-        user.get().setUpdateDate(LocalDate.now());
-        userRepository.save(user.get());
-        authManager.updateRole(dto);
-        return true;
+        Optional<UserProfile> userProfile = userRepository.findOptionalByAuthId(authId.get());
+        if (userProfile.isEmpty()) {
+            throw new UserException(ErrorType.USER_NOT_FOUND);
+        }
+        if (userProfile.get().getRole().equals(ERole.ADMIN)){
+            Optional<UserProfile> user = userRepository.findOptionalByAuthId(dto.getAuthId());
+            user.get().setRole(dto.getSelectedRole());
+            user.get().setUpdateDate(LocalDate.now());
+            userRepository.save(user.get());
+            authManager.updateRole(dto);
+            return true;
+        }
+        throw new UserException(ErrorType.AUTHORITY_ERROR);
+
     }
 
 
