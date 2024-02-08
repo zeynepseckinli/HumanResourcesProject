@@ -622,14 +622,12 @@ public class UserService {
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
         }
-        Optional<UserProfile> manager = userRepository.findOptionalByAuthId(authId.get());
-        if (manager.isPresent() && manager.get().getRole().equals(ERole.MANAGER)){
-            List<UserProfile> users = userRepository.findAllUserProfileByManagerId(manager.get().getId());
-            return users.stream()
-                    .map(user -> UserMapper.INSTANCE.toUserResponseDto(user))
-                    .collect(Collectors.toList());
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+        if (user.isPresent() && user.get().getRole().equals(ERole.ADMIN)) {
+            return companyRepository.findAllByState(state);
+        } else {
+            throw new UserException(ErrorType.AUTHORITY_ERROR);
         }
-        throw new UserException(ErrorType.AUTHORITY_ERROR);
     }
 
 
