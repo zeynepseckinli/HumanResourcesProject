@@ -615,6 +615,8 @@ public class UserService {
 //        }
 //    }
 
+
+
     public List<Company> findAllCompanies(String token, EState state) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
@@ -626,6 +628,22 @@ public class UserService {
         } else {
             throw new UserException(ErrorType.AUTHORITY_ERROR);
         }
+    }
+
+
+    public List<UserResponseDto> findAllUserProfileByManagerId(GetProfileByTokenRequestDto dto) {
+        Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
+        if (authId.isEmpty()){
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> manager = userRepository.findOptionalByAuthId(authId.get());
+        if (manager.isPresent() && manager.get().getRole().equals(ERole.MANAGER)){
+            List<UserProfile> users = userRepository.findAllUserProfileByManagerId(manager.get().getId());
+            return users.stream()
+                    .map(user -> UserMapper.INSTANCE.toUserResponseDto(user))
+                    .collect(Collectors.toList());
+        }
+        throw new UserException(ErrorType.AUTHORITY_ERROR);
     }
 
 }
