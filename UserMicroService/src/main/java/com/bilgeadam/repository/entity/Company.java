@@ -1,5 +1,6 @@
 package com.bilgeadam.repository.entity;
 
+import com.bilgeadam.utility.enums.EState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,11 +20,18 @@ public class Company extends BaseEntity {
     @Id
     private String id;
     private String name;
-    private String taxNumber;
     private String title;
+    private String mersisNumber;
+    private String taxNumber;
+    private String taxAdministration;
+    private String logo;
     private String address;
     private String phone;
     private String email;
     private int numberOfEmployees;
     private LocalDate yearOfEstablishment;
+    private LocalDate contractStartDare;
+    private LocalDate contractEndDate;
+
+
 }

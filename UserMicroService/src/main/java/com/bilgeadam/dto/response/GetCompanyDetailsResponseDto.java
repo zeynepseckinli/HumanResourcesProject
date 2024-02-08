@@ -1,5 +1,7 @@
-package com.bilgeadam.dto.request;
+package com.bilgeadam.dto.response;
 
+
+import com.bilgeadam.utility.enums.EState;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,20 +13,17 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CreateCompanyRequestDto {
+public class GetCompanyDetailsResponseDto {
 
-    private String token;
+    private String id;
     private String name;
     private String title;
     private String taxNumber;
-    private String taxAdministration;
     private String address;
     private String phone;
     private String email;
     private int numberOfEmployees;
     private LocalDate yearOfEstablishment;
-    private LocalDate contractStartDare;
-    private LocalDate contractEndDate;
-
+    private EState state;
 
 }

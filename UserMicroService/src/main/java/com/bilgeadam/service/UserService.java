@@ -7,9 +7,7 @@ import com.bilgeadam.exception.ErrorType;
 import com.bilgeadam.exception.UserException;
 import com.bilgeadam.manager.AuthManager;
 import com.bilgeadam.mapper.*;
-import com.bilgeadam.rabbitmq.model.RegisterModel;
 import com.bilgeadam.rabbitmq.producer.RegisterMailProducer;
-import com.bilgeadam.rabbitmq.producer.RegisterProducer;
 import com.bilgeadam.repository.*;
 import com.bilgeadam.repository.entity.*;
 import com.bilgeadam.utility.JwtTokenManager;
@@ -18,10 +16,7 @@ import com.bilgeadam.utility.enums.EState;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -286,7 +281,7 @@ public class UserService {
         if (advance.isEmpty()) {
             throw new UserException(ErrorType.REQUEST_NOT_FOUND);
         }
-        if(!(advance.get().getResponseUserId().equals(user.get().getId()))){
+        if (!(advance.get().getResponseUserId().equals(user.get().getId()))) {
             throw new UserException(ErrorType.AUTHORITY_ERROR);
         }
         advance.get().setState(dto.getSelectedState());
@@ -349,6 +344,7 @@ public class UserService {
         return true;
     }
 
+
     public Boolean updatePermissionState(UpdateStateRequestDto dto) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
         if (authId.isEmpty()) {
@@ -362,7 +358,7 @@ public class UserService {
         if (permission.isEmpty()) {
             throw new UserException(ErrorType.REQUEST_NOT_FOUND);
         }
-        if(!(permission.get().getResponseUserId().equals(user.get().getId()))){
+        if (!(permission.get().getResponseUserId().equals(user.get().getId()))) {
             throw new UserException(ErrorType.AUTHORITY_ERROR);
         }
         permission.get().setState(dto.getSelectedState());
@@ -436,7 +432,7 @@ public class UserService {
             throw new UserException(ErrorType.USER_NOT_FOUND);
         }
         Optional<Expense> expense = expenseRepository.findById(id);
-        if(!(expense.get().getRequestUserId().equals(user.get().getId()))){
+        if (!(expense.get().getRequestUserId().equals(user.get().getId()))) {
             throw new UserException(ErrorType.BAD_REQUEST);
         }
         String url = imageUpload(file);
@@ -458,7 +454,7 @@ public class UserService {
         if (expense.isEmpty()) {
             throw new UserException(ErrorType.REQUEST_NOT_FOUND);
         }
-        if(!(expense.get().getResponseUserId().equals(user.get().getId()))){
+        if (!(expense.get().getResponseUserId().equals(user.get().getId()))) {
             throw new UserException(ErrorType.AUTHORITY_ERROR);
         }
         expense.get().setState(dto.getSelectedState());
@@ -543,6 +539,7 @@ public class UserService {
             company.get().setNumberOfEmployees(dto.getNumberOfEmployees());
             company.get().setYearOfEstablishment(dto.getYearOfEstablishment());
             company.get().setUpdateDate(LocalDate.now());
+            company.get().setState(dto.getState());
             companyRepository.save(company.get());
         } else {
             throw new UserException(ErrorType.AUTHORITY_ERROR);
@@ -552,28 +549,67 @@ public class UserService {
     }
 
 
-//    public Boolean deleteCompany(String id) {
+//    public Boolean deleteCompany(String id, String token) {
 //        Optional<Company> company = companyRepository.findById(id);
 //        if (company.isEmpty()) {
 //            throw new UserException(ErrorType.COMPANY_NOT_FOUND);
 //        }
-//        companyRepository.delete(company.get());
+//        Optional<Long> authId = jwtTokenManager.getIdByToken(id);
+//        if (authId.isEmpty()) {
+//            throw new UserException(ErrorType.INVALID_TOKEN);
+//        }
+//        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+//        if (user.isPresent() && user.get().getRole().equals(ERole.ADMIN)) {
+//            company.get().setState(EState.DELETED);
+//            companyRepository.save(company.get());
+//
+//        }
 //        return true;
+//
 //    }
 
+    public GetCompanyDetailsResponseDto getDetailsByCompanyId(GetCompanyDetailsRequestDto dto) {
+        Optional<Company> company = companyRepository.findById(dto.getCompanyId());
+        if (company.isEmpty()) {
+            throw new UserException(ErrorType.COMPANY_NOT_FOUND);
+        }
+        Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+        if (user.isPresent() && user.get().getRole().equals(ERole.ADMIN)) {
+            return CompanyMapper.INSTANCE.toCompanyResponseDto(company.get());
+        } else {
+            throw new UserException(ErrorType.AUTHORITY_ERROR);
+        }
+    }
 
-    public List<Company> findAllCompanies(String token) {
+
+//    public List<Company> findAllCompanies(String token) {
+//        Optional<Long> authId = jwtTokenManager.getIdByToken(token);
+//        if (authId.isEmpty()) {
+//            throw new UserException(ErrorType.INVALID_TOKEN);
+//        }
+//        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+//        if (user.isPresent() && user.get().getRole().equals(ERole.ADMIN)) {
+//            return companyRepository.findAllByStateNot(EState.DELETED);
+//        } else {
+//            throw new UserException(ErrorType.AUTHORITY_ERROR);
+//        }
+//    }
+
+    public List<Company> findAllCompanies(String token, EState state) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
             throw new UserException(ErrorType.INVALID_TOKEN);
         }
         Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
         if (user.isPresent() && user.get().getRole().equals(ERole.ADMIN)) {
-            return companyRepository.findAll();
+            return companyRepository.findAllByState(state);
         } else {
             throw new UserException(ErrorType.AUTHORITY_ERROR);
         }
     }
-
 
 }

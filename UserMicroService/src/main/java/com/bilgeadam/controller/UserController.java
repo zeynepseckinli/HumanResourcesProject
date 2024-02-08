@@ -4,13 +4,11 @@ import com.bilgeadam.dto.request.*;
 import com.bilgeadam.dto.response.*;
 import com.bilgeadam.repository.CompanyRepository;
 import com.bilgeadam.repository.entity.Company;
-import com.bilgeadam.repository.entity.UserProfile;
 import com.bilgeadam.service.UserService;
+import com.bilgeadam.utility.enums.EState;
 import io.swagger.v3.oas.annotations.Hidden;
-import jakarta.annotation.PreDestroy;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,14 +32,14 @@ public class UserController {
         return "This is User Service";
     }
 
-//    @PostMapping(SAVE)
+    //    @PostMapping(SAVE)
 //    @CrossOrigin("*")
 //    public ResponseEntity<Void> save(@RequestBody @Valid UserSaveRequestDto dto) {
 //        UserProfile userProfile = userService.saveUser(dto);
 //        return ResponseEntity.ok().build();
 //    }
     @PostMapping("/create-user")
-    public ResponseEntity<Boolean> createUser(@RequestBody @Valid CreateUserRequestDto dto){
+    public ResponseEntity<Boolean> createUser(@RequestBody @Valid CreateUserRequestDto dto) {
         return ResponseEntity.ok(userService.createUser(dto));
     }
 
@@ -57,7 +55,7 @@ public class UserController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<Boolean> forgotPassword(@RequestBody @Valid ForgotPasswordRequestDto dto){
+    public ResponseEntity<Boolean> forgotPassword(@RequestBody @Valid ForgotPasswordRequestDto dto) {
         return ResponseEntity.ok(userService.forgotPassword(dto));
     }
 
@@ -69,7 +67,7 @@ public class UserController {
 
 
     @PutMapping("/update-user-state-for-password")
-    public ResponseEntity<Boolean> updateUserStateForPassword(AuthStateUpdateRequestDto dto){
+    public ResponseEntity<Boolean> updateUserStateForPassword(AuthStateUpdateRequestDto dto) {
         return ResponseEntity.ok(userService.updateUserStateForPassword(dto));
     }
 
@@ -90,17 +88,17 @@ public class UserController {
     }
 
     @PutMapping("/update-advance-state")
-    public ResponseEntity<Boolean> updateAdvanceState (@RequestBody UpdateStateRequestDto dto) {
+    public ResponseEntity<Boolean> updateAdvanceState(@RequestBody UpdateStateRequestDto dto) {
         return ResponseEntity.ok(userService.updateAdvanceState(dto));
     }
 
     @GetMapping("/find-all-advances-for-request-user")
-    public ResponseEntity<List<AdvanceListResponseDtoForRequestUser>> findAllAdvancesForRequestUser(String token){
+    public ResponseEntity<List<AdvanceListResponseDtoForRequestUser>> findAllAdvancesForRequestUser(String token) {
         return ResponseEntity.ok(userService.findAllAdvancesForRequestUser(token));
     }
 
     @GetMapping("/find-all-advances-for-response-user")
-    public ResponseEntity<List<AdvanceListResponseDtoForResponseUser>> findAllAdvancesForResponseUser(String token){
+    public ResponseEntity<List<AdvanceListResponseDtoForResponseUser>> findAllAdvancesForResponseUser(String token) {
         return ResponseEntity.ok(userService.findAllAdvancesForResponseUser(token));
     }
 
@@ -111,42 +109,42 @@ public class UserController {
     }
 
     @PutMapping("/update-permission-state")
-    public ResponseEntity<Boolean> updatePermissionState(@RequestBody UpdateStateRequestDto dto){
+    public ResponseEntity<Boolean> updatePermissionState(@RequestBody UpdateStateRequestDto dto) {
         return ResponseEntity.ok(userService.updatePermissionState(dto));
     }
 
     @GetMapping("/find-all-permissions-for-request-user")
-    public ResponseEntity<List<PermissionListResponseDtoForRequestUser>> findAllPermissionsForRequestUser(String token){
+    public ResponseEntity<List<PermissionListResponseDtoForRequestUser>> findAllPermissionsForRequestUser(String token) {
         return ResponseEntity.ok(userService.findAllPermissionsForRequestUser(token));
     }
 
     @GetMapping("/find-all-permissions-for-response-user")
-    public ResponseEntity<List<PermissionListResponseDtoForResponseUser>> findAllPermissionsForResponseUser(String token){
+    public ResponseEntity<List<PermissionListResponseDtoForResponseUser>> findAllPermissionsForResponseUser(String token) {
         return ResponseEntity.ok(userService.findAllPermissionsForResponseUser(token));
     }
 
     @PostMapping(value = "/create-expense")
-    public ResponseEntity<Boolean> createExpense(@RequestBody CreateExpenseRequestDto dto){
+    public ResponseEntity<Boolean> createExpense(@RequestBody CreateExpenseRequestDto dto) {
         return ResponseEntity.ok(userService.createExpense(dto));
     }
 
     @PostMapping(value = "/update-expense-image", consumes = "multipart/form-data")
     public ResponseEntity<String> updateExpenseImage(@RequestParam("file") MultipartFile file, @RequestParam("token") String token, @RequestParam("id") String id) throws IOException {
-        return ResponseEntity.ok(userService.updateExpenseImage(file, token,id));
+        return ResponseEntity.ok(userService.updateExpenseImage(file, token, id));
     }
 
     @PutMapping("/update-expense-state")
-    public ResponseEntity<Boolean> updateExpenseState(@RequestBody UpdateStateRequestDto dto){
+    public ResponseEntity<Boolean> updateExpenseState(@RequestBody UpdateStateRequestDto dto) {
         return ResponseEntity.ok(userService.updateExpenseState(dto));
     }
 
     @GetMapping("/find-all-expenses-for-request-user")
-    public ResponseEntity<List<ExpensesListResponseDtoForRequestUser>> findAllExpensesForRequestUser(String token){
+    public ResponseEntity<List<ExpensesListResponseDtoForRequestUser>> findAllExpensesForRequestUser(String token) {
         return ResponseEntity.ok(userService.findAllExpensesForRequestUser(token));
     }
 
     @GetMapping("/find-all-expenses-for-response-user")
-    public ResponseEntity<List<ExpensesListResponseDtoForResponseUser>> findAllExpensesForResponseUser(String token){
+    public ResponseEntity<List<ExpensesListResponseDtoForResponseUser>> findAllExpensesForResponseUser(String token) {
         return ResponseEntity.ok(userService.findAllExpensesForResponseUser(token));
     }
 
@@ -161,9 +159,25 @@ public class UserController {
 
     }
 
-    @GetMapping("/find-all-company")
-    public ResponseEntity<List<Company>> findAll(String token) {
-        return ResponseEntity.ok(userService.findAllCompanies(token));
+    @GetMapping("/get-details")
+    public ResponseEntity<GetCompanyDetailsResponseDto> getDetailsCompany(GetCompanyDetailsRequestDto dto) {
+        return ResponseEntity.ok(userService.getDetailsByCompanyId(dto));
+    }
+
+//    @GetMapping("/find-all-companies")
+//    public ResponseEntity<List<Company>> findAll(String token) {
+//        return ResponseEntity.ok(userService.findAllCompanies(token));
+//    }
+
+//    @DeleteMapping("/delete-company")
+//    public ResponseEntity<Boolean> deleteCompany(@RequestBody @Valid String id, String token) {
+//        return ResponseEntity.ok(userService.deleteCompany(id, token));
+//    }
+
+
+    @GetMapping("/find-all-companies")
+    public ResponseEntity<List<Company>> findAll(String token, EState state) {
+        return ResponseEntity.ok(userService.findAllCompanies(token, state));
     }
 
 
