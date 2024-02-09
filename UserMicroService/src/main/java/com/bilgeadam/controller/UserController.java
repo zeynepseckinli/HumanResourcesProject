@@ -27,6 +27,7 @@ public class UserController {
     private final UserService userService;
     private final CompanyRepository companyRepository;
 
+    @Hidden
     @GetMapping("/get-message")
     public String getMessage() {
         return "This is User Service";
@@ -41,6 +42,11 @@ public class UserController {
     @PostMapping("/create-user")
     public ResponseEntity<Boolean> createUser(@RequestBody @Valid CreateUserRequestDto dto) {
         return ResponseEntity.ok(userService.createUser(dto));
+    }
+
+    @PostMapping("/create-admin")
+    public ResponseEntity<Boolean> createAdmin(@RequestBody @Valid CreateAdminRequestDto dto){
+        return ResponseEntity.ok(userService.createAdmin(dto));
     }
 
 
@@ -66,6 +72,7 @@ public class UserController {
     }
 
 
+    @Hidden
     @PutMapping("/update-user-state-for-password")
     public ResponseEntity<Boolean> updateUserStateForPassword(@RequestBody Long id){
         return ResponseEntity.ok(userService.updateUserStateForPassword(id));
@@ -159,7 +166,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/get-details")
+    @GetMapping("/get-company-details")
     public ResponseEntity<GetCompanyDetailsResponseDto> getDetailsCompany(GetCompanyDetailsRequestDto dto) {
         return ResponseEntity.ok(userService.getDetailsByCompanyId(dto));
     }

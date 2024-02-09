@@ -15,6 +15,7 @@ import com.bilgeadam.utility.enums.ERole;
 import com.bilgeadam.utility.enums.EState;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,79 @@ public class UserService {
 //                .authId(dto.getAuthId())
 //                .build());
 //    }
+
+    @PostConstruct
+    public Boolean createSuperAdmin(){
+        Optional<List<UserProfile>> userProfileList = userRepository.findOptionalUserProfileByRole(ERole.SUPERADMIN);
+        if (userProfileList.get().isEmpty()) {
+            String randomPass = generateRandomPassword(8);
+            String email = "superadmin@bilgeadmin.com";
+            ResponseEntity<SaveAuthResponseDto> authDto = authManager.save(SaveAuthRequestDto.builder()
+                    .email(email)
+                    .password(randomPass)
+                    .build());
+            SaveAuthResponseDto saveAuthResponseDto = authDto.getBody();
+            UserProfile user = new UserProfile();
+            user.setAuthId(saveAuthResponseDto.getAuthId());
+            user.setEmail(email);
+            user.setActivationCode(randomPass);
+            user.setState(EState.PENDING);
+            user.setCreateDate(LocalDate.now());
+            user.setUpdateDate(LocalDate.now());
+            user.setRole(ERole.SUPERADMIN);
+            authManager.updateRole(AuthRoleUpdateRequestDto.builder()
+                    .authId(user.getAuthId())
+                    .selectedRole(ERole.SUPERADMIN)
+                    .build());
+            userRepository.save(user);
+        }
+        return true;
+    }
+
+
+    @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+    public Boolean createAdmin(CreateAdminRequestDto dto) {
+        Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        ERole roleByToken = jwtTokenManager.getRoleByToken(dto.getToken()).get();
+        if (!(roleByToken == ERole.SUPERADMIN)) {
+            throw new UserException(ErrorType.AUTHORITY_ERROR);
+        }
+        String randomPass = generateRandomPassword(8);
+        String email = generateEmailForAdmin(dto);
+        ResponseEntity<SaveAuthResponseDto> authDto = authManager.save(SaveAuthRequestDto.builder()
+                .email(email)
+                .password(randomPass)
+                .build());
+        SaveAuthResponseDto saveAuthResponseDto = authDto.getBody();
+        UserProfile user = UserMapper.INSTANCE.fromCreateAdminRequestDto(dto);
+        user.setAuthId(saveAuthResponseDto.getAuthId());
+        user.setEmail(email);
+        user.setActivationCode(randomPass);
+        user.setState(EState.PENDING);
+        user.setCreateDate(LocalDate.now());
+        user.setUpdateDate(LocalDate.now());
+        user.setRole(ERole.ADMIN);
+        authManager.updateRole(AuthRoleUpdateRequestDto.builder()
+                    .authId(user.getAuthId())
+                    .selectedRole(ERole.ADMIN)
+                    .build());
+        userRepository.save(user);
+
+        registerMailProducer.sendActivationCode(UserMapper.INSTANCE.fromUserToRegisterModel(user));
+        return true;
+    }
+
+    public String generateEmailForAdmin(CreateAdminRequestDto dto) {
+        String name = dto.getName();
+        String secondName = dto.getSecondName();
+        String surname = dto.getSurname();
+        String secondSurname = dto.getSecondSurname();
+        String email = name + secondName + "." + surname + secondSurname + "@bilgeadmin.com";
+        return convertToAscii(email.toLowerCase());
+    }
 
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
     public Boolean createUser(CreateUserRequestDto dto) {
@@ -91,6 +165,7 @@ public class UserService {
         registerMailProducer.sendActivationCode(UserMapper.INSTANCE.fromUserToRegisterModel(user));
         return true;
     }
+
 
     public String convertToAscii(String mail) {
         mail = mail.replaceAll("ı", "i").replaceAll("ğ", "g").replaceAll("ü", "u")
@@ -645,5 +720,6 @@ public class UserService {
         }
         throw new UserException(ErrorType.AUTHORITY_ERROR);
     }
+
 
 }

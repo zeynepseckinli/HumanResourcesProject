@@ -24,6 +24,7 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @Hidden
     @GetMapping("/get-message")
     public String getMessage(){
         return "This is Auth Service";

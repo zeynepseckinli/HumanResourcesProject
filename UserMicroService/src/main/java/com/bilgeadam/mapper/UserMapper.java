@@ -1,9 +1,6 @@
 package com.bilgeadam.mapper;
 
-import com.bilgeadam.dto.request.AuthUpdateRequestDto;
-import com.bilgeadam.dto.request.CreateUserRequestDto;
-import com.bilgeadam.dto.request.UserSaveRequestDto;
-import com.bilgeadam.dto.request.UserUpdateRequestDto;
+import com.bilgeadam.dto.request.*;
 import com.bilgeadam.dto.response.UserResponseDto;
 import com.bilgeadam.rabbitmq.model.RegisterMailModel;
 import com.bilgeadam.repository.entity.UserProfile;
@@ -20,6 +17,7 @@ public interface UserMapper {
     UserResponseDto fromUserUpdateRequestDto(final UserUpdateRequestDto dto);
     UserProfile toUser (final UserUpdateRequestDto dto);
     UserProfile fromCreateUserRequestDto(final CreateUserRequestDto dto);
+    UserProfile fromCreateAdminRequestDto(final CreateAdminRequestDto dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     UserProfile fromUpdateDtoToUserProfile(UserUpdateRequestDto dto, @MappingTarget UserProfile user);

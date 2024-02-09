@@ -1,6 +1,7 @@
 package com.bilgeadam.manager;
 
 import com.bilgeadam.dto.request.AuthStateUpdateRequestDto;
+import com.bilgeadam.dto.request.CreateAdminRequestDto;
 import com.bilgeadam.dto.request.GetProfileByTokenRequestDto;
 import com.bilgeadam.dto.request.UserSaveRequestDto;
 import com.bilgeadam.dto.response.UserResponseDto;
@@ -26,7 +27,8 @@ public interface UserManager {
     public ResponseEntity<Void> save(@RequestBody @Valid UserSaveRequestDto dto);
     @PutMapping("/update-user-state")
     public ResponseEntity<Boolean> updateUserState(@RequestBody @Valid AuthStateUpdateRequestDto dto);
-
+    @PostMapping("/create-admin")
+    public ResponseEntity<Boolean> createAdmin(@RequestBody @Valid CreateAdminRequestDto dto);
     @PostMapping("/get-profile")
     public ResponseEntity<UserResponseDto> getProfileByToken(@RequestBody @Valid GetProfileByTokenRequestDto dto);
 
