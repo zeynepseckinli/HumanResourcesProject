@@ -19,8 +19,7 @@ public interface UserMapper {
     UserProfile fromCreateUserRequestDto(final CreateUserRequestDto dto);
     UserProfile fromCreateAdminRequestDto(final CreateAdminRequestDto dto);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    UserProfile fromUpdateDtoToUserProfile(UserUpdateRequestDto dto, @MappingTarget UserProfile user);
+    UserProfile fromUpdateDtoToUserProfile(UserUpdateRequestDto dto);
 
     RegisterMailModel fromUserToRegisterModel(final UserProfile user);
 

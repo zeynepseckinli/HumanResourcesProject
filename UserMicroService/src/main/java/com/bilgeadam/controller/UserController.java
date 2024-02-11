@@ -99,6 +99,11 @@ public class UserController {
         return ResponseEntity.ok(userService.updateAdvanceState(dto));
     }
 
+    @PutMapping("/update-advance")
+    public ResponseEntity<Boolean> updateAdvance(@RequestBody UpdateAdvanceRequestDto dto) {
+        return ResponseEntity.ok(userService.updateAdvance(dto));
+    }
+
     @GetMapping("/find-all-advances-for-request-user")
     public ResponseEntity<List<AdvanceListResponseDtoForRequestUser>> findAllAdvancesForRequestUser(String token) {
         return ResponseEntity.ok(userService.findAllAdvancesForRequestUser(token));
@@ -118,6 +123,11 @@ public class UserController {
     @PutMapping("/update-permission-state")
     public ResponseEntity<Boolean> updatePermissionState(@RequestBody UpdateStateRequestDto dto) {
         return ResponseEntity.ok(userService.updatePermissionState(dto));
+    }
+
+    @PutMapping("/update-permission")
+    public ResponseEntity<Boolean> updatePermission(@RequestBody UpdatePermissionRequestDto dto) {
+        return ResponseEntity.ok(userService.updatePermission(dto));
     }
 
     @GetMapping("/find-all-permissions-for-request-user")
@@ -143,6 +153,11 @@ public class UserController {
     @PutMapping("/update-expense-state")
     public ResponseEntity<Boolean> updateExpenseState(@RequestBody UpdateStateRequestDto dto) {
         return ResponseEntity.ok(userService.updateExpenseState(dto));
+    }
+
+    @PutMapping("/update-expense")
+    public ResponseEntity<Boolean> updateExpense(@RequestBody UpdateExpenseRequestDto dto) {
+        return ResponseEntity.ok(userService.updateExpense(dto));
     }
 
     @GetMapping("/find-all-expenses-for-request-user")

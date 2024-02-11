@@ -1,25 +1,21 @@
 package com.bilgeadam.dto.request;
 
-import com.bilgeadam.utility.enums.EState;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
-@Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class CreatePermissionRequestDto {
-
+@Builder
+public class UpdatePermissionRequestDto {
     private String token;
+    private String id;
     private String permissionType;
     private LocalDate permissionStart;
     private LocalDate permissionEnd;
     private int permissionDuration;
-
 }
-

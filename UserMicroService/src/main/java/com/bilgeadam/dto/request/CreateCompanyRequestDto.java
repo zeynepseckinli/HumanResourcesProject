@@ -25,6 +25,4 @@ public class CreateCompanyRequestDto {
     private LocalDate yearOfEstablishment;
     private LocalDate contractStartDare;
     private LocalDate contractEndDate;
-
-
 }

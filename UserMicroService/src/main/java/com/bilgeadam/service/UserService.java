@@ -242,9 +242,28 @@ public class UserService {
             throw new UserException(ErrorType.INVALID_TOKEN);
         }
         Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
-        if (user.isPresent()) {
-            userRepository.save(UserMapper.INSTANCE.fromUpdateDtoToUserProfile(dto, user.get()));
+        if (user.isPresent() && (user.get().getRole() == ERole.MANAGER)) {
+            Optional<UserProfile> userProfile = userRepository.findOptionalByAuthId(dto.getAuthId());
+            if (userProfile.get().getManagerId().equals(user.get().getId())){
+                userProfile.get().setName(dto.getName());
+                userProfile.get().setSecondName(dto.getSecondName());
+                userProfile.get().setSurname(dto.getSurname());
+                userProfile.get().setSecondSurname(dto.getSecondSurname());
+                userProfile.get().setPersonalEmail(dto.getPersonalEmail());
+                userProfile.get().setIdentityNumber(dto.getIdentityNumber());
+                userProfile.get().setBirthPlace(dto.getBirthPlace());
+                userProfile.get().setOccupation(dto.getOccupation());
+                userProfile.get().setDepartment(dto.getDepartment());
+                userProfile.get().setAddress(dto.getAddress());
+                userProfile.get().setPhone(dto.getPhone());
+                userProfile.get().setSalary(dto.getSalary());
+                userProfile.get().setBirthDate(dto.getBirthDate());
+                userProfile.get().setJobStart(dto.getJobStart());
+                userProfile.get().setJobEnd(dto.getJobEnd());
+                userProfile.get().setAvatar(dto.getAvatar());
 
+                userRepository.save(userProfile.get());
+            }
             return true;
         }
         throw new UserException(ErrorType.USER_NOT_FOUND);
@@ -381,6 +400,33 @@ public class UserService {
         return true;
     }
 
+    public Boolean updateAdvance(UpdateAdvanceRequestDto dto) {
+        Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+        if (user.isEmpty()) {
+            throw new UserException(ErrorType.USER_NOT_FOUND);
+        }
+        Optional<Advance> advance = advanceRepository.findById(dto.getId());
+        if (advance.isEmpty()) {
+            throw new UserException(ErrorType.REQUEST_NOT_FOUND);
+        }
+        if (!(advance.get().getRequestUserId().equals(user.get().getId()))) {
+            throw new UserException(ErrorType.AUTHORITY_ERROR);
+        }
+        advance.get().setAdvanceAmount(dto.getAdvanceAmount());
+        advance.get().setUnitOfCurrency(dto.getUnitOfCurrency());
+        advance.get().setDescription(dto.getDescription());
+        advance.get().setAdvanceType(dto.getAdvanceType());
+        advance.get().setRequestDate(dto.getRequestDate());
+        advance.get().setResponseUserId(user.get().getManagerId());
+        advance.get().setResponseDate(LocalDate.now());
+        advanceRepository.save(advance.get());
+        return true;
+    }
+
     public List<AdvanceListResponseDtoForRequestUser> findAllAdvancesForRequestUser(String token) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
@@ -430,6 +476,7 @@ public class UserService {
         Permission permission = PermissionMapper.INSTANCE.fromDto(dto);
         permission.setRequestUserId(user.get().getId());
         permission.setResponseUserId(user.get().getManagerId());
+        permission.setRequestDate(LocalDate.now());
         permission.setState(EState.PENDING);
         permissionRepository.save(permission);
         return true;
@@ -453,6 +500,32 @@ public class UserService {
             throw new UserException(ErrorType.AUTHORITY_ERROR);
         }
         permission.get().setState(dto.getSelectedState());
+        permission.get().setResponseUserId(user.get().getManagerId());
+        permission.get().setResponseDate(LocalDate.now());
+        permissionRepository.save(permission.get());
+        return true;
+    }
+
+    public Boolean updatePermission(UpdatePermissionRequestDto dto) {
+        Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+        if (user.isEmpty()) {
+            throw new UserException(ErrorType.USER_NOT_FOUND);
+        }
+        Optional<Permission> permission = permissionRepository.findById(dto.getId());
+        if (permission.isEmpty()) {
+            throw new UserException(ErrorType.REQUEST_NOT_FOUND);
+        }
+        if (!(permission.get().getRequestUserId().equals(user.get().getId()))) {
+            throw new UserException(ErrorType.AUTHORITY_ERROR);
+        }
+        permission.get().setPermissionType(dto.getPermissionType());
+        permission.get().setPermissionStart(dto.getPermissionStart());
+        permission.get().setPermissionEnd(dto.getPermissionEnd());
+        permission.get().setPermissionDuration(dto.getPermissionDuration());
         permission.get().setResponseUserId(user.get().getManagerId());
         permission.get().setResponseDate(LocalDate.now());
         permissionRepository.save(permission.get());
@@ -555,6 +628,33 @@ public class UserService {
         return true;
     }
 
+    public Boolean updateExpense(UpdateExpenseRequestDto dto) {
+        Optional<Long> authId = jwtTokenManager.getIdByToken(dto.getToken());
+        if (authId.isEmpty()) {
+            throw new UserException(ErrorType.INVALID_TOKEN);
+        }
+        Optional<UserProfile> user = userRepository.findOptionalByAuthId(authId.get());
+        if (user.isEmpty()) {
+            throw new UserException(ErrorType.USER_NOT_FOUND);
+        }
+        Optional<Expense> expense = expenseRepository.findById(dto.getId());
+        if (expense.isEmpty()) {
+            throw new UserException(ErrorType.REQUEST_NOT_FOUND);
+        }
+        if (!(expense.get().getRequestUserId().equals(user.get().getId()))) {
+            throw new UserException(ErrorType.AUTHORITY_ERROR);
+        }
+        expense.get().setRequestDate(dto.getRequestDate());
+        expense.get().setDescription(dto.getDescription());
+        expense.get().setExpenseAmount(dto.getExpenseAmount());
+        expense.get().setExpenseType(dto.getExpenseType());
+        expense.get().setUnitOfCurrency(dto.getUnitOfCurrency());
+        expense.get().setResponseUserId(user.get().getManagerId());
+        expense.get().setResponseDate(LocalDate.now());
+        expenseRepository.save(expense.get());
+        return true;
+    }
+
     public List<ExpensesListResponseDtoForRequestUser> findAllExpensesForRequestUser(String token) {
         Optional<Long> authId = jwtTokenManager.getIdByToken(token);
         if (authId.isEmpty()) {
@@ -606,7 +706,6 @@ public class UserService {
             throw new UserException(ErrorType.AUTHORITY_ERROR);
         }
         return true;
-
     }
 
 
@@ -636,7 +735,6 @@ public class UserService {
             throw new UserException(ErrorType.AUTHORITY_ERROR);
         }
         return true;
-
     }
 
 

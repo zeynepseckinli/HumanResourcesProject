@@ -19,13 +19,11 @@ public class UserUpdateRequestDto {
     private String secondName;
     private String surname;
     private String secondSurname;
-    private String email;
     private String personalEmail;
     private String identityNumber;
     private String birthPlace;
     private String occupation;
     private String department;
-    private String companyId;
     private String address;
     private String phone;
     private Long salary;

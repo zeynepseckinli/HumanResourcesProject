@@ -20,7 +20,6 @@ public class UpdateCompanyRequestDto {
     private String title;
     private String taxNumber;
     private String taxAdministration;
-    private String logo;
     private String address;
     private String phone;
     private String email;
